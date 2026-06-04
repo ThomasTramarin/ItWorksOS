@@ -6,7 +6,7 @@ export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
 
-echo "--- [WomhOS] Cross-compiler toolchain loaded ---"
+echo "--- [IwomhOS] Cross-compiler toolchain loaded ---"
 
 make clean
 
