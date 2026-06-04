@@ -8,37 +8,74 @@ LINKER_SCRIPT = linker.ld
 BIN_DIR       = ./bin
 BUILD_DIR     = ./build
 SRC_DIR       = ./src
+KERNEL_SRC_DIR = $(SRC_DIR)/kernel
 
 # Compilation Flags
-FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -I$(SRC_DIR)/kernel
+FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -I$(KERNEL_SRC_DIR)
+
+KERNEL_ENTRY_SRC = $(SRC_DIR)/kernel.asm
+KERNEL_ENTRY_OBJ = $(BUILD_DIR)/kernel.asm.o
+
+C_SOURCES   = $(wildcard $(KERNEL_SRC_DIR)/*.c)
+ASM_SOURCES = $(wildcard $(KERNEL_SRC_DIR)/*.asm)
+
+C_OBJECTS   = $(patsubst $(KERNEL_SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(C_SOURCES))
+ASM_OBJECTS = $(patsubst $(KERNEL_SRC_DIR)/%.asm, $(BUILD_DIR)/%.asm.o, $(ASM_SOURCES))
 
 # Object Files
-FILES = $(BUILD_DIR)/kernel.asm.o $(BUILD_DIR)/kernel.o
+FILES = $(KERNEL_ENTRY_OBJ) $(ASM_OBJECTS) $(C_OBJECTS)
 
 .PHONY: all clean
 
 all: $(BIN_DIR)/os.bin
-	@echo "--- [WomhOS] Compilation completed successfully ---"
+	@echo "--- [IwomhOS] Compilation completed successfully ---"
 
-# 1. Merge bootloader and kernel binaries, then truncate the image to 50K
+# Merge bootloader and kernel binaries, then truncate the image to 50K
 $(BIN_DIR)/os.bin: $(BIN_DIR)/boot.bin $(BIN_DIR)/kernel.bin
 	@mkdir -p $(BIN_DIR)
 	dd if=$(BIN_DIR)/boot.bin of=$@ bs=512 conv=notrunc 2>/dev/null
 	dd if=$(BIN_DIR)/kernel.bin of=$@ bs=512 seek=1 conv=notrunc 2>/dev/null
 	truncate -s 50K $@
 
-# 2. Compile the Bootloader (16-bit Assembly)
+# Compile the Bootloader (16-bit Assembly)
 $(BIN_DIR)/boot.bin: $(SRC_DIR)/boot/boot.asm
 	@mkdir -p $(BIN_DIR)
 	$(ASM) -f bin $< -o $@
 
-# 3. Compile the Kernel entry point (32-bit Assembly)
-$(BUILD_DIR)/kernel.asm.o: $(SRC_DIR)/kernel.asm
+# Compile the Kernel entry point (32-bit Assembly)
+$(KERNEL_ENTRY_OBJ): $(KERNEL_ENTRY_SRC)
 	@mkdir -p $(BUILD_DIR)
 	$(ASM) -f elf -g $< -o $@
 
+# Generic .asm -> .asm.o
+$(BUILD_DIR)/%.asm.o: $(KERNEL_SRC_DIR)/%.asm
+	@mkdir -p $(BUILD_DIR)
+	$(ASM) -f elf -g $< -o $@
+
+# Generic .c -> .o
+$(BUILD_DIR)/%.o: $(KERNEL_SRC_DIR)/%.c $(KERNEL_SRC_DIR)/%.h
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
+
+# fallback (if a file .c doesn't have a file .h)
+$(BUILD_DIR)/%.o: $(KERNEL_SRC_DIR)/%.c
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
+
 # 4. Compile the Kernel core (C)
 $(BUILD_DIR)/kernel.o: $(SRC_DIR)/kernel/kernel.c $(SRC_DIR)/kernel/kernel.h
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
+
+$(BUILD_DIR)/vga.o: $(SRC_DIR)/kernel/vga.c $(SRC_DIR)/kernel/vga.h
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
+
+$(BUILD_DIR)/ports.o: $(SRC_DIR)/kernel/ports.c $(SRC_DIR)/kernel/ports.h
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
+
+$(BUILD_DIR)/idt.o: $(SRC_DIR)/kernel/idt.c $(SRC_DIR)/kernel/idt.h
 	@mkdir -p $(BUILD_DIR)
 	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
 
@@ -54,4 +91,4 @@ $(BIN_DIR)/kernel.bin: $(BUILD_DIR)/completeKernel.o $(LINKER_SCRIPT)
 clean:
 	rm -rf $(BIN_DIR)/*
 	rm -rf $(BUILD_DIR)/*
-	@echo "--- [WomhOS] Build and bin directories cleaned ---"
+	@echo "--- [IwomhOS] Build and bin directories cleaned ---"
