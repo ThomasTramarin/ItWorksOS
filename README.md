@@ -1,2 +1,2 @@
-# WomhOS (WorksOnMyHP Operating System)
+# IwomhOS (ItWorksOnMyHP Operating System)
 
