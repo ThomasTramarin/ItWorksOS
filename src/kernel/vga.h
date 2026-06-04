@@ -1,0 +1,54 @@
+#ifndef VGA_H
+#define VGA_H
+
+#define VGA_COLS 80
+#define VGA_ROWS 25
+
+// Standard dark colors
+#define VGA_COLOR_BLACK 0x00
+#define VGA_COLOR_BLUE 0x01
+#define VGA_COLOR_GREEN 0x02
+#define VGA_COLOR_CYAN 0x03
+#define VGA_COLOR_RED 0x04
+#define VGA_COLOR_MAGENTA 0x05
+#define VGA_COLOR_BROWN 0x06
+#define VGA_COLOR_LIGHT_GREY 0x07
+
+// Bright / Light colors
+#define VGA_COLOR_DARK_GREY 0x08
+#define VGA_COLOR_LIGHT_BLUE 0x09
+#define VGA_COLOR_LIGHT_GREEN 0x0A
+#define VGA_COLOR_LIGHT_CYAN 0x0B
+#define VGA_COLOR_LIGHT_RED 0x0C
+#define VGA_COLOR_LIGHT_MAGENTA 0x0D
+#define VGA_COLOR_YELLOW 0x0E
+#define VGA_COLOR_WHITE 0x0F
+
+#define VGA_BLINK_TRUE 1
+#define VGA_BLINK_FALSE 0
+
+// attributes
+struct __attribute__((packed)) vga_cell_attr {
+  unsigned char fg : 4;
+  unsigned char bg : 3;
+  unsigned char blink : 1;
+};
+
+struct __attribute__((packed)) vga_cell {
+  char ch : 8;
+  struct vga_cell_attr attr;
+};
+
+void vga_disable_cursor();
+
+void vga_init(unsigned char defaultFg, unsigned char defaultBg,
+              unsigned char defaultBlink);
+
+void vga_clear_screen();
+
+void vga_set_cell(struct vga_cell *cell, unsigned int x, unsigned int y);
+void vga_set_char(char ch, unsigned int x, unsigned int y);
+void vga_putc(char ch);
+void vga_puts(const char *str);
+
+#endif
