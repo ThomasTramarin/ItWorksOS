@@ -1,12 +1,14 @@
 #include "kernel.h"
+#include "vga.h"
 
 void kmain() {
 
-  char *video = (char *)0xB8000;
+  vga_init(VGA_COLOR_WHITE, VGA_COLOR_BLUE, VGA_BLINK_FALSE);
+  vga_clear_screen();
 
-  video[0] = 'A';
-  video[1] = 0xF0;
+  vga_puts("ItWorksOnMyHP-OS");
 
   while (1) {
+    asm volatile("hlt");
   }
 }
