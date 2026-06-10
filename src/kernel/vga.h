@@ -1,6 +1,13 @@
 #ifndef VGA_H
 #define VGA_H
 
+// VGA CRT Controller
+#define PORT_VGA_INDEX 0x3D4
+#define PORT_VGA_DATA 0x3D5
+
+#define VGA_REG_CURSOR_START 0x0A
+#define VGA_CURSOR_DISABLE 0x20
+
 #define VGA_COLS 80
 #define VGA_ROWS 25
 

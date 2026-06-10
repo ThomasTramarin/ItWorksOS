@@ -1,4 +1,4 @@
-#include "ports.h"
+#include "io.h"
 
 unsigned char inb(unsigned short port) {
   unsigned char res;

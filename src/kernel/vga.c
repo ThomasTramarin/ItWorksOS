@@ -1,5 +1,5 @@
 #include "vga.h"
-#include "ports.h"
+#include "io.h"
 
 struct __attribute__((packed)) vga_driver {
   struct vga_cell *text_buffer;
