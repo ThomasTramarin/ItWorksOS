@@ -66,6 +66,7 @@ void vga_putc(char ch) {
   switch (ch) {
   case '\n':
     vga_driver.cursorY++;
+    vga_driver.cursorX = 0; // implicit CR
     return;
   case '\r':
     vga_driver.cursorX = 0;
