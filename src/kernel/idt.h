@@ -1,5 +1,6 @@
 #ifndef IDT_H
 #define IDT_H
+#include "types.h"
 
 /**
  * IDT entries scheme
@@ -23,21 +24,20 @@ enum idt_dpl {
 };
 
 struct __attribute__((packed)) idt_entry {
-  unsigned short offset_low;       // bits 0-15
-  unsigned short segment_selector; // bits 16-31
-  unsigned char reserved;          // bits 32-39
-  unsigned char flags;             // bits 40-47
-  unsigned short offset_high;      // bits 48-63
+  uint16_t offset_low;       // bits 0-15
+  uint16_t segment_selector; // bits 16-31
+  uint8_t reserved;          // bits 32-39
+  uint8_t flags;             // bits 40-47
+  uint16_t offset_high;      // bits 48-63
 };
 
 struct __attribute__((packed)) idt_descriptor {
-  unsigned short size; // bits 0-15
-  unsigned int offset; // bits 16-47
+  uint16_t size;   // bits 0-15
+  uint32_t offset; // bits 16-47
 };
 
-void idt_set_gate(unsigned char num, unsigned int offset,
-                  unsigned short segment_selector, unsigned char gate_type,
-                  unsigned char dpl, unsigned char present);
+void idt_set_gate(uint8_t num, uintptr_t offset, uint16_t segment_selector,
+                  uint8_t gate_type, uint8_t dpl, uint8_t present);
 
 void idt_init(void);
 

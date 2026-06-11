@@ -3,17 +3,16 @@
 
 struct __attribute__((packed)) vga_driver {
   struct vga_cell *text_buffer;
-  unsigned char cursorX;
-  unsigned char cursorY;
-  unsigned char defaultFg;
-  unsigned char defaultBg;
-  unsigned char defaultBlink;
+  uint8_t cursorX;
+  uint8_t cursorY;
+  uint8_t defaultFg;
+  uint8_t defaultBg;
+  uint8_t defaultBlink;
 };
 
 static struct vga_driver vga_driver;
 
-void vga_init(unsigned char defaultFg, unsigned char defaultBg,
-              unsigned char defaultBlink) {
+void vga_init(uint8_t defaultFg, uint8_t defaultBg, uint8_t defaultBlink) {
 
   vga_driver.text_buffer = (struct vga_cell *)0xB8000;
   vga_driver.defaultBg = defaultBg;
@@ -39,14 +38,14 @@ void vga_disable_cursor() {
   outb(PORT_VGA_DATA, VGA_CURSOR_DISABLE);
 }
 
-void vga_set_cell(struct vga_cell *cell, unsigned int x, unsigned int y) {
+void vga_set_cell(struct vga_cell *cell, uint32_t x, uint32_t y) {
   if (x >= VGA_COLS || y >= VGA_ROWS)
     return;
 
   vga_driver.text_buffer[(VGA_COLS * y) + x] = *cell;
 }
 
-void vga_set_char(char ch, unsigned int x, unsigned int y) {
+void vga_set_char(char ch, uint32_t x, uint32_t y) {
 
   struct vga_cell default_cell = {
       .ch = ch,

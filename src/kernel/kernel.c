@@ -3,7 +3,7 @@
 #include "pic.h"
 #include "vga.h"
 
-void kmain() {
+void kmain(void) {
 
   vga_init(VGA_COLOR_WHITE, VGA_COLOR_BLUE, VGA_BLINK_FALSE);
   vga_clear_screen();

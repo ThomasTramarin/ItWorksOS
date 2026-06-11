@@ -1,5 +1,6 @@
 #ifndef VGA_H
 #define VGA_H
+#include "types.h"
 
 // VGA CRT Controller
 #define PORT_VGA_INDEX 0x3D4
@@ -36,9 +37,9 @@
 
 // attributes
 struct __attribute__((packed)) vga_cell_attr {
-  unsigned char fg : 4;
-  unsigned char bg : 3;
-  unsigned char blink : 1;
+  uint8_t fg : 4;
+  uint8_t bg : 3;
+  uint8_t blink : 1;
 };
 
 struct __attribute__((packed)) vga_cell {
@@ -48,13 +49,12 @@ struct __attribute__((packed)) vga_cell {
 
 void vga_disable_cursor();
 
-void vga_init(unsigned char defaultFg, unsigned char defaultBg,
-              unsigned char defaultBlink);
+void vga_init(uint8_t defaultFg, uint8_t defaultBg, uint8_t defaultBlink);
 
 void vga_clear_screen();
 
-void vga_set_cell(struct vga_cell *cell, unsigned int x, unsigned int y);
-void vga_set_char(char ch, unsigned int x, unsigned int y);
+void vga_set_cell(struct vga_cell *cell, uint32_t x, uint32_t y);
+void vga_set_char(char ch, uint32_t x, uint32_t y);
 void vga_putc(char ch);
 void vga_puts(const char *str);
 

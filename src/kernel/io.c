@@ -2,13 +2,13 @@
 
 #define UNUSED_PORT 0x80
 
-unsigned char inb(unsigned short port) {
-  unsigned char res;
+uint8_t inb(uint16_t port) {
+  uint8_t res;
   asm volatile("inb %1, %0" : "=a"(res) : "Nd"(port));
   return res;
 }
 
-void outb(unsigned short port, unsigned char value) {
+void outb(uint16_t port, uint8_t value) {
   asm volatile("outb %0, %1" : : "a"(value), "Nd"(port));
 }
 
