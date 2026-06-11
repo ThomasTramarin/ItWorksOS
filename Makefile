@@ -62,23 +62,6 @@ $(BUILD_DIR)/%.o: $(KERNEL_SRC_DIR)/%.c
 	@mkdir -p $(BUILD_DIR)
 	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
 
-# 4. Compile the Kernel core (C)
-$(BUILD_DIR)/kernel.o: $(SRC_DIR)/kernel/kernel.c $(SRC_DIR)/kernel/kernel.h
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
-
-$(BUILD_DIR)/vga.o: $(SRC_DIR)/kernel/vga.c $(SRC_DIR)/kernel/vga.h
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
-
-$(BUILD_DIR)/ports.o: $(SRC_DIR)/kernel/ports.c $(SRC_DIR)/kernel/ports.h
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
-
-$(BUILD_DIR)/idt.o: $(SRC_DIR)/kernel/idt.c $(SRC_DIR)/kernel/idt.h
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
-
 # 5. Relocatable link (merges Kernel Assembly and C objects)
 $(BUILD_DIR)/completeKernel.o: $(FILES)
 	$(LD) -g -relocatable $(FILES) -o $@
