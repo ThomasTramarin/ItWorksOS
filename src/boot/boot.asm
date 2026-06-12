@@ -31,7 +31,7 @@ mov dh, 0x00    ; head = 0
 mov cl, 0x02    ; sector = 2 (sector 1 is the bootloader)
 mov ch, 0x00    ; cylinder 0
 mov ah, 0x02    ; BIOS read sectors function
-mov al, 32      ; read 32 sectors (~16 KB max kernel size)
+mov al, 64      ; read 64 sectors (~32 KB max kernel size)
 int 0x13        
 
 jc disk_read_error  ; if CF is set, something went wrong
@@ -113,7 +113,7 @@ times 446 - ($ - $$) db 0
 db 0x80                 ; bootable
 db 0x01, 0x01, 0x00     ; CHS start address
 db 0x0C                 ; partition type: FAT32 LBA
-db 0xFE, 0xFFFF, 0xFFFF ; CHS end address   
+db 0xFE, 0xFF, 0xFF ; CHS end address   
 dd 0x00000001           ; hidden sectors before partition (LBA 1)
 dd 0x00010000           ; total sectors in partition (32)
 
