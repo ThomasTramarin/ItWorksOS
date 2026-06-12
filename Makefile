@@ -16,11 +16,11 @@ FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -I$(K
 KERNEL_ENTRY_SRC = $(SRC_DIR)/kernel.asm
 KERNEL_ENTRY_OBJ = $(BUILD_DIR)/kernel.asm.o
 
-C_SOURCES   = $(wildcard $(KERNEL_SRC_DIR)/*.c)
-ASM_SOURCES = $(wildcard $(KERNEL_SRC_DIR)/*.asm)
+C_SOURCES   := $(shell find $(SRC_DIR) -name "*.c")
+ASM_SOURCES := $(shell find $(SRC_DIR) -name "*.asm" ! -name "kernel.asm" ! -path "$(SRC_DIR)/boot/*")
 
-C_OBJECTS   = $(patsubst $(KERNEL_SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(C_SOURCES))
-ASM_OBJECTS = $(patsubst $(KERNEL_SRC_DIR)/%.asm, $(BUILD_DIR)/%.asm.o, $(ASM_SOURCES))
+C_OBJECTS   := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(C_SOURCES))
+ASM_OBJECTS := $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/%.asm.o, $(ASM_SOURCES))
 
 # Object Files
 FILES = $(KERNEL_ENTRY_OBJ) $(ASM_OBJECTS) $(C_OBJECTS)
@@ -48,18 +48,13 @@ $(KERNEL_ENTRY_OBJ): $(KERNEL_ENTRY_SRC)
 	$(ASM) -f elf -g $< -o $@
 
 # Generic .asm -> .asm.o
-$(BUILD_DIR)/%.asm.o: $(KERNEL_SRC_DIR)/%.asm
-	@mkdir -p $(BUILD_DIR)
+$(BUILD_DIR)/%.asm.o: $(SRC_DIR)/%.asm
+	@mkdir -p $(dir $@)
 	$(ASM) -f elf -g $< -o $@
 
 # Generic .c -> .o
-$(BUILD_DIR)/%.o: $(KERNEL_SRC_DIR)/%.c $(KERNEL_SRC_DIR)/%.h
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
-
-# fallback (if a file .c doesn't have a file .h)
-$(BUILD_DIR)/%.o: $(KERNEL_SRC_DIR)/%.c
-	@mkdir -p $(BUILD_DIR)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
 	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
 
 # 5. Relocatable link (merges Kernel Assembly and C objects)
