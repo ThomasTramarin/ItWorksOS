@@ -1,6 +1,6 @@
 #ifndef VGA_H
 #define VGA_H
-#include "types.h"
+#include "klib/types.h"
 
 // VGA CRT Controller
 #define PORT_VGA_INDEX 0x3D4
