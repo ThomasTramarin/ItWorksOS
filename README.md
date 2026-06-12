@@ -14,6 +14,8 @@ This is a learning project focused on understanding low-level system management
 - **GDT**: Basic Global Description Table implementation
 - **IDT**: Basic IDT implementation and ISR dispatcher
 - **PIC**: Programmable Interrupt Controller (8259A) driver implementation (initialization and IRQs remap)
+- **Kernel Library**:   
+    - `conv`: Conversion module (Integer to ASCII function)
 
 ## Prerequisites to build
 - `i686-elf-gcc` (cross-compiler)
