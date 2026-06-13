@@ -16,4 +16,6 @@ void __attribute__((cdecl)) isr_init(void);
 
 void __attribute__((cdecl)) isr_handler(struct registers *regs);
 
+void isr_register_handler(uint8_t n, isr_t handler);
+
 #endif

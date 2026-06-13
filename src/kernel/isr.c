@@ -1,6 +1,5 @@
 #include "isr.h"
 #include "idt.h"
-#include "io.h"
 #include "pic.h"
 #include "vga.h"
 
@@ -523,7 +522,7 @@ void __attribute__((cdecl)) isr_init(void) {
 
 isr_t interrupt_handlers[256];
 
-void isr_register_interrupt_handler(uint8_t n, isr_t handler) {
+void isr_register_handler(uint8_t n, isr_t handler) {
   interrupt_handlers[n] = handler;
 }
 

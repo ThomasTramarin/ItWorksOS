@@ -49,7 +49,7 @@ void pic_init(void) {
   io_wait();
 
   pic_set_all_irqs(false); // Disable all irqs
-  pic_enable_irq(1);       // Enable keyboard
+  pic_enable_irq(0);       // Enable timer
 }
 
 void pic_enable_irq(uint8_t irq) {
