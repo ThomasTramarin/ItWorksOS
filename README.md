@@ -2,11 +2,11 @@
 
 A bare-metal kernel for the x86 architecture 
 
-> Note: this project is still under development
+> Note: this project is still under active development
 
 ## Overview
 
-This is a learning project focused on understanding low-level system management
+This is a learning project focused on understanding low-level system management.
 
 ## Features
 - **Architecture**: x86 32-bit (Protected Mode)
@@ -14,13 +14,17 @@ This is a learning project focused on understanding low-level system management
 - **GDT**: Basic Global Description Table implementation
 - **IDT**: Basic IDT implementation and ISR dispatcher
 - **PIC**: Programmable Interrupt Controller (8259A) driver implementation (initialization and IRQs remap)
+- **Timer**: Timer interrupt driver (Programmable Interval Timer)
 - **Kernel Library**:   
     - `conv`: Conversion module (Integer to ASCII function)
+    - `va`: Variadic function arguments module
 
-## Prerequisites to build
-- `i686-elf-gcc` (cross-compiler)
+## Prerequisites
+- `nasm`
+- `i686-elf-gcc`: C cross-compiler
+- `i686-elf-ld`: Linker
 - `make`
-- `qemy-system-i386` (emulator)
+- `qemu-system-i386`: Emulator
 
 ## Build & Run
 ```bash
@@ -30,7 +34,7 @@ git clone https://github.com/ThomasTramarin/ItWorksOnMyHP-OS.git
 cd ItWorksOnMyHP-OS
 
 # Make the script executable
-chmod +u ./build.sh
+chmod +x ./build.sh
 
 # Build the project
 ./build.sh
