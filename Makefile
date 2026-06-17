@@ -13,8 +13,8 @@ KERNEL_SRC_DIR = $(SRC_DIR)/kernel
 # Compilation Flags
 FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -I$(KERNEL_SRC_DIR)
 
-KERNEL_ENTRY_SRC = $(SRC_DIR)/kernel.asm
-KERNEL_ENTRY_OBJ = $(BUILD_DIR)/kernel.asm.o
+KERNEL_ENTRY_SRC = $(SRC_DIR)/kernel/kernel.asm
+KERNEL_ENTRY_OBJ = $(BUILD_DIR)/kernel/kernel.asm.o
 
 C_SOURCES   := $(shell find $(SRC_DIR) -name "*.c")
 ASM_SOURCES := $(shell find $(SRC_DIR) -name "*.asm" ! -name "kernel.asm" ! -path "$(SRC_DIR)/boot/*")
@@ -44,7 +44,7 @@ $(BIN_DIR)/boot.bin: $(SRC_DIR)/boot/boot.asm
 
 # Compile the Kernel entry point (32-bit Assembly)
 $(KERNEL_ENTRY_OBJ): $(KERNEL_ENTRY_SRC)
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(dir $@)
 	$(ASM) -f elf -g $< -o $@
 
 # Generic .asm -> .asm.o
