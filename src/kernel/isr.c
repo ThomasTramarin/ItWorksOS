@@ -1,5 +1,6 @@
 #include "isr.h"
 #include "idt.h"
+#include "klib/cui.h"
 #include "pic.h"
 #include "vga.h"
 
@@ -531,7 +532,7 @@ void __attribute__((cdecl)) isr_handler(struct registers *regs) {
     isr_t handler = interrupt_handlers[regs->int_no];
     handler(regs);
   } else {
-    vga_puts("Unhandled interrupt");
+    cui_klog("Unhandled Interrupt: %d\n", regs->int_no);
   }
 
   if (regs->int_no >= 32 && regs->int_no <= 47) {
