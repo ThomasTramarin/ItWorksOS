@@ -14,10 +14,14 @@ This is a learning project focused on understanding low-level system management.
 - **GDT**: Basic Global Description Table implementation
 - **IDT**: Basic IDT implementation and ISR dispatcher
 - **PIC**: Programmable Interrupt Controller (8259A) driver implementation (initialization and IRQs remap)
+- **VGA**: Vga text mode driver
 - **Timer**: Timer interrupt driver (Programmable Interval Timer)
 - **Kernel Library**:   
     - `conv`: Conversion module (Integer to ASCII function)
-    - `va`: Variadic function arguments module
+    - `va`: Variadic function arguments module  
+    - `cui`: Character User Interface kernel module (abstraction layer over the VGA driver)
+    - `time`: Time module providing system tick counter and sleep functionality
+    - `types`: Basic data type definitions
 
 ## Prerequisites
 - `nasm`
