@@ -2,15 +2,35 @@
 #define VGA_H
 #include "klib/types.h"
 
-// VGA CRT Controller
-#define PORT_VGA_INDEX 0x3D4
-#define PORT_VGA_DATA 0x3D5
+/**
+ * @file vga.h
+ * @brief VGA text mode driver interface (80x25 characters)
+ *
+ * Design:
+ * - Uses a software backbuffer instead of writing directly to VGA memory
+ * - Uses a dirty rectangle system to optimize screen updates
+ * - Supports basic hardware cursor control via VGA CRT controller ports
+ * - All coordinates starts from 0
+ * - Out-of-bounds writes are ignored
+ * - Flush must be called to apply changes
+ */
 
-#define VGA_REG_CURSOR_START 0x0A
-#define VGA_CURSOR_DISABLE 0x20
+// VGA CRT Controller PORTS
+#define VGA_INDEX_PORT 0x3D4
+#define VGA_DATA_PORT 0x3D5
 
+// VGA CRT Controller REGISTERS
+#define VGA_CURSOR_START_REG 0x0A
+#define VGA_CURSOR_END_REG 0x0B
+#define VGA_CURSOR_HIBYTE_POS_REG 0x0E
+#define VGA_CURSOR_LOBYTE_POS_REG 0x0F
+
+// VGA text mode dimensions
 #define VGA_COLS 80
 #define VGA_ROWS 25
+
+// VGA memory address
+#define VGA_MEM_ADDR 0xB8000
 
 // Standard dark colors
 #define VGA_COLOR_BLACK 0x00
@@ -35,27 +55,53 @@
 #define VGA_BLINK_TRUE 1
 #define VGA_BLINK_FALSE 0
 
-// attributes
+/**
+ * VGA text mode attribute byte layout
+ * - fg: foreground color (0-15)
+ * - bg: background color (0-7)
+ * - blink: blink flag (bit 7 of attribute)
+ */
 struct __attribute__((packed)) vga_cell_attr {
   uint8_t fg : 4;
   uint8_t bg : 3;
   uint8_t blink : 1;
 };
 
+// One character cell in VGA text mode (char + attribute)
 struct __attribute__((packed)) vga_cell {
-  char ch : 8;
+  uint8_t ch;
   struct vga_cell_attr attr;
 };
 
-void vga_disable_cursor();
+/**
+ * Represents the region of the screen that has changed.
+ * Used to minimize writes to VGA memory during flush.
+ *
+ * x1 = VGA_COLS, y1 = VGA_ROWS, x2 = 0, y2 = 0 -> means "no dirty region"
+ * x1 = 0, y1 = 0, x2 = VGA_COLS - 1, y2 = VGA_ROWS - 1 -> means "fullscreen
+ * dirty"
+ */
+struct vga_dirty_rect {
+  uint8_t x1, y1;
+  uint8_t x2, y2;
+};
 
-void vga_init(uint8_t defaultFg, uint8_t defaultBg, uint8_t defaultBlink);
+void vga_init(void);
 
-void vga_clear_screen();
+void vga_set_cell(uint8_t x, uint8_t y, struct vga_cell cell);
+bool vga_get_cell(uint8_t x, uint8_t y, struct vga_cell *out);
 
-void vga_set_cell(struct vga_cell *cell, uint32_t x, uint32_t y);
-void vga_set_char(char ch, uint32_t x, uint32_t y);
-void vga_putc(char ch);
-void vga_puts(const char *str);
+void vga_flush(void);
+void vga_scroll(struct vga_cell_attr blank_attr);
+
+void vga_fill_rect(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2,
+                   struct vga_cell cell);
+
+void vga_cursor_enable(void);
+void vga_cursor_disable(void);
+
+void vga_cursor_set_xy(uint8_t x, uint8_t y);
+void vga_cursor_get_xy(uint8_t *x, uint8_t *y);
+void vga_cursor_set_shape(uint8_t start_scanline, uint8_t end_scanline);
 
 #endif
