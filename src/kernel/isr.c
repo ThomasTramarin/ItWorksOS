@@ -1,8 +1,8 @@
 #include "isr.h"
 #include "idt.h"
+#include "io.h"
 #include "klib/cui.h"
 #include "pic.h"
-#include "vga.h"
 
 void __attribute__((cdecl)) isr0(void);
 void __attribute__((cdecl)) isr1(void);
@@ -528,14 +528,36 @@ void isr_register_handler(uint8_t n, isr_t handler) {
 }
 
 void __attribute__((cdecl)) isr_handler(struct registers *regs) {
+
+  // Spurious Master PIC
+  if (regs->int_no == 39) {
+
+    // if the CPU is not currently working for IRQ 7
+    if ((pic_read_reg_isr(false) & 0x80) == 0) {
+      return;
+    }
+  }
+
+  // Spurious Slave PIC
+  if (regs->int_no == 47) {
+
+    // if the CPU is not currently working for IRQ 15
+    if ((pic_read_reg_isr(true) & 0x80) == 0) {
+
+      // send EOI only to the Master PIC
+      pic_send_eoi(2);
+      return;
+    }
+  }
+
   if (interrupt_handlers[regs->int_no] != 0) {
     isr_t handler = interrupt_handlers[regs->int_no];
     handler(regs);
   } else {
     cui_klog("Unhandled Interrupt: %d\n", regs->int_no);
-  }
 
-  if (regs->int_no >= 32 && regs->int_no <= 47) {
-    pic_send_eoi(regs->int_no - 32); // send EOI only if it is an IRQ
+    if (regs->int_no >= 32 && regs->int_no <= 47) {
+      pic_send_eoi(regs->int_no - 32);
+    }
   }
 }

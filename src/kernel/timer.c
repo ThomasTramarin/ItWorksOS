@@ -2,8 +2,7 @@
 #include "io.h"
 #include "isr.h"
 #include "klib/time.h"
-#include "klib/types.h"
-#include "vga.h"
+#include "pic.h"
 
 /**
  * @brief Timer driver (IRQ 0)
@@ -11,7 +10,10 @@
 
 // ticks counts the number of IRQ-0 received by the CPU, it starts from 0
 
-void isr32_handler(struct registers *regs) { time_incr_ticks(); }
+void isr32_handler(struct registers *regs) {
+  time_incr_ticks();
+  pic_send_eoi(0);
+}
 
 void timer_init(void) {
   isr_register_handler(32, isr32_handler);

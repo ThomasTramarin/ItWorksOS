@@ -23,6 +23,11 @@ typedef enum {
   PIC_ICW4_SPECIAL_FULLY_NESTED_MODE = 0x10
 } PIC_ICW4;
 
+typedef enum {
+  PIC_OCW3_RIS_IRR = 0x0A,
+  PIC_OCW3_RIS_ISR = 0x0B,
+} PIC_OCW3;
+
 void pic_init(void) {
   // ICW1
   outb(PIC1_COMMAND_PORT, PIC_ICW1_IC4 | PIC_ICW1_INIT);
@@ -111,4 +116,16 @@ void pic_send_eoi(uint8_t irq) {
 
   outb(PIC1_COMMAND_PORT, 0x20);
   io_wait();
+}
+
+uint8_t pic_read_reg_isr(bool slave) {
+  if (slave) {
+    outb(PIC2_COMMAND_PORT, PIC_OCW3_RIS_ISR);
+    io_wait();
+    return inb(PIC2_COMMAND_PORT);
+  } else {
+    outb(PIC1_COMMAND_PORT, PIC_OCW3_RIS_ISR);
+    io_wait();
+    return inb(PIC1_COMMAND_PORT);
+  }
 }
