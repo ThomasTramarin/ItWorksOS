@@ -4,10 +4,10 @@
 
 static struct cui_state state;
 
-void cui_init(uint8_t default_fg, uint8_t default_bg, uint8_t default_blank) {
+void cui_init(uint8_t default_fg, uint8_t default_bg, uint8_t default_blink) {
   state.current_attr.fg = default_fg;
   state.current_attr.bg = default_bg;
-  state.current_attr.blink = default_blank;
+  state.current_attr.blink = default_blink;
 
   state.cursor_x = 0;
   state.cursor_y = 0;
