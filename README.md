@@ -12,8 +12,9 @@ This is a learning project focused on understanding low-level system management.
 - **Architecture**: x86 32-bit (Protected Mode)
 - **Bootloader**: Minimal bootloader on MBR (Master Boot Record)
 - **GDT**: Basic Global Description Table implementation
-- **IDT**: Basic IDT implementation and ISR dispatcher
-- **PIC**: Programmable Interrupt Controller (8259A) driver implementation (initialization and IRQs remap)
+- **IDT**: Basic IDT implementation and centralized ISR dispatcher
+- **Exceptions**: Dedicated CPU exception handlers (0-31) with registers dump and Kernel Panic screen  
+- **PIC**: Programmable Interrupt Controller (8259A) driver implementation (initialization, IRQs remap, spurious IRQ handling)
 - **VGA**: Vga text mode driver
 - **Timer**: Timer interrupt driver (Programmable Interval Timer)
 - **Kernel Library**:   
