@@ -1,23 +1,13 @@
 #include "conv.h"
 #include "types.h"
 
-/**
- * @brief Converts an integer to its ASCII representation
- * @param value The integer
- * @param str Destination buffer. Must be at least CONV_ITOA_MAX_CHARS_BASE_X to
- * prevent buffer overflows
- * @param base  Numeric base (e.g., CONV_ITOA_BASE_10, CONV_ITOA_BASE_16).
- *
- * @note If base is 10 and value is negative, a '-' sign is added. All other
- * bases treat the value as raw bit patterns (unsigned).
- */
 void conv_itoa(int32_t value, char *str, uint8_t base) {
   char *ptr = str;
 
   uint32_t n;
   uint8_t digits = 0;
 
-  bool is_negative = (base == CONV_ITOA_BASE_10 && value < 0);
+  bool is_negative = (base == CONV_BASE_10 && value < 0);
 
   if (is_negative) {
     *ptr++ = '-';
@@ -50,4 +40,38 @@ void conv_itoa(int32_t value, char *str, uint8_t base) {
     start[i] = start[digits - 1 - i];
     start[digits - 1 - i] = tmp;
   }
+}
+
+int32_t conv_atoi(const char *str, uint8_t base) {
+  int32_t result = 0;
+  bool is_negative = false;
+
+  const char *ptr = str;
+
+  // check if the number starts with the minus sign
+  if (*ptr == '-') {
+    is_negative = true;
+    ptr++; // consume '-'
+  }
+
+  // iterate over characters
+  while (*ptr != '\0') {
+    uint8_t num;
+    if (*ptr >= '0' && *ptr <= '9') {
+      num = *ptr - '0';
+    } else if (*ptr >= 'A' && *ptr <= 'F') {
+      num = *ptr - 'A' + 10;
+    }
+
+    result = result * base;
+    result = result + num;
+
+    ptr++;
+  }
+
+  if (is_negative) {
+    result = -result;
+  }
+
+  return result;
 }

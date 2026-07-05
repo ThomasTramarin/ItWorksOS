@@ -106,6 +106,8 @@ void cui_putc(char ch) {
 
   if (state.cursor_x >= VGA_COLS)
     cui_newline();
+
+  vga_flush();
 }
 
 void cui_puts(const char *str) {
@@ -119,7 +121,7 @@ void __attribute__((cdecl)) cui_printf(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
 
-  char tmp[CONV_ITOA_MAX_CHARS_BASE_2]; // max ITOA digits
+  char tmp[CONV_MAX_CHARS_BASE_2]; // max ITOA digits
 
   for (int i = 0; fmt[i] != '\0'; i++) {
     if (fmt[i] == '%') {
@@ -128,28 +130,28 @@ void __attribute__((cdecl)) cui_printf(const char *fmt, ...) {
       switch (fmt[i]) {
       case 'd': {
         int32_t v = va_arg(args, int32_t);
-        conv_itoa(v, tmp, CONV_ITOA_BASE_10);
+        conv_itoa(v, tmp, CONV_BASE_10);
         cui_puts(tmp);
         break;
       }
 
       case 'x': {
         uint32_t v = va_arg(args, uint32_t);
-        conv_itoa(v, tmp, CONV_ITOA_BASE_16);
+        conv_itoa(v, tmp, CONV_BASE_16);
         cui_puts(tmp);
         break;
       }
 
       case 'o': {
         uint32_t v = va_arg(args, uint32_t);
-        conv_itoa(v, tmp, CONV_ITOA_BASE_8);
+        conv_itoa(v, tmp, CONV_BASE_8);
         cui_puts(tmp);
         break;
       }
 
       case 'b': {
         uint32_t v = va_arg(args, uint32_t);
-        conv_itoa(v, tmp, CONV_ITOA_BASE_2);
+        conv_itoa(v, tmp, CONV_BASE_2);
         cui_puts(tmp);
         break;
       }
@@ -157,7 +159,7 @@ void __attribute__((cdecl)) cui_printf(const char *fmt, ...) {
       case 'p': {
         uint32_t v = va_arg(args, uint32_t);
         cui_puts("0x");
-        conv_itoa(v, tmp, CONV_ITOA_BASE_16);
+        conv_itoa(v, tmp, CONV_BASE_16);
         cui_puts(tmp);
         break;
       }
