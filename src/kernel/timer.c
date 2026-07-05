@@ -10,7 +10,7 @@
 
 // ticks counts the number of IRQ-0 received by the CPU, it starts from 0
 
-void isr32_handler(struct registers *regs) {
+static void isr32_handler(struct registers *regs) {
   time_incr_ticks();
   pic_send_eoi(0);
 }

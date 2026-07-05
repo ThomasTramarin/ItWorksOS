@@ -26,6 +26,4 @@ enum {
 
 void timer_init(void);
 
-void isr32_handler(struct registers *regs);
-
 #endif
