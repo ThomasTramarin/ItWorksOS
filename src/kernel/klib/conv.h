@@ -1,7 +1,7 @@
 #ifndef CONV_H
 #define CONV_H
 
-#include "types.h"
+#include <base/stdint.h>
 
 #define CONV_BASE_2 2
 #define CONV_BASE_8 8

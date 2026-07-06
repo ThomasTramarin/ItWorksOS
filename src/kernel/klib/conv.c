@@ -1,5 +1,4 @@
 #include "conv.h"
-#include "types.h"
 
 void conv_itoa(int32_t value, char *str, uint8_t base) {
   char *ptr = str;

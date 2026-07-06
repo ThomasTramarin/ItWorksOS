@@ -1,7 +1,7 @@
 #ifndef TIME_H
 #define TIME_H
 
-#include "types.h"
+#include <base/stdint.h>
 
 uint64_t time_get_ticks(void);
 void time_incr_ticks(void);

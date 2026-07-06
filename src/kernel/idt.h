@@ -1,6 +1,6 @@
 #ifndef IDT_H
 #define IDT_H
-#include "klib/types.h"
+#include <base/stdint.h>
 
 /**
  * IDT entries scheme

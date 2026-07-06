@@ -1,6 +1,6 @@
 #ifndef PIC_H
 #define PIC_H
-#include "klib/types.h"
+#include <base/stdint.h>
 
 void pic_init(void);
 

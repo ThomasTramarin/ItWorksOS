@@ -1,6 +1,6 @@
 #ifndef VGA_H
 #define VGA_H
-#include "klib/types.h"
+#include <base/stdint.h>
 
 /**
  * @file vga.h
