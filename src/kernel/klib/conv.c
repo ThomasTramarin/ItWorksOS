@@ -10,7 +10,7 @@ void conv_itoa(int32_t value, char *str, uint8_t base) {
 
   if (is_negative) {
     *ptr++ = '-';
-    n = (uint32_t)(-value);
+    n = -(uint32_t)value;
   } else {
     n = (uint32_t)value;
   }
@@ -55,16 +55,21 @@ int32_t conv_atoi(const char *str, uint8_t base) {
 
   // iterate over characters
   while (*ptr != '\0') {
-    uint8_t num;
+    uint8_t num = 255;
+
     if (*ptr >= '0' && *ptr <= '9') {
       num = *ptr - '0';
     } else if (*ptr >= 'A' && *ptr <= 'F') {
       num = *ptr - 'A' + 10;
+    } else if (*ptr >= 'a' && *ptr <= 'f') {
+      num = *ptr - 'a' + 10;
     }
 
-    result = result * base;
-    result = result + num;
+    if (num >= base) {
+      break;
+    }
 
+    result = (result * base) + num;
     ptr++;
   }
 
