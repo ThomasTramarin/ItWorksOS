@@ -1,4 +1,4 @@
-#/bin/bash 
+#!/bin/bash 
 
 # TOOLCHAIN CONFIGURATION 
 # Set the paths to locate the i686-elf cross-compiler

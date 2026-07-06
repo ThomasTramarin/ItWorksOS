@@ -4,14 +4,15 @@ CC  = i686-elf-gcc
 LD  = i686-elf-ld
 
 # Project Structure
-LINKER_SCRIPT = linker.ld
-BIN_DIR       = ./bin
-BUILD_DIR     = ./build
-SRC_DIR       = ./src
+LINKER_SCRIPT  = linker.ld
+BIN_DIR        = ./bin
+BUILD_DIR      = ./build
+SRC_DIR        = ./src
+INCLUDE_DIR    = ./include
 KERNEL_SRC_DIR = $(SRC_DIR)/kernel
 
 # Compilation Flags
-FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -I$(KERNEL_SRC_DIR)
+FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -I$(KERNEL_SRC_DIR) -I$(INCLUDE_DIR)
 
 KERNEL_ENTRY_SRC = $(SRC_DIR)/kernel/kernel.asm
 KERNEL_ENTRY_OBJ = $(BUILD_DIR)/kernel/kernel.asm.o
@@ -38,7 +39,7 @@ $(BIN_DIR)/os.bin: $(BIN_DIR)/boot.bin $(BIN_DIR)/kernel.bin
 	truncate -s 50K $@
 
 # Compile the Bootloader (16-bit Assembly)
-$(BIN_DIR)/boot.bin: $(SRC_DIR)/boot/boot.asm
+$(BIN_DIR)/boot.bin: $(SRC_DIR)/boot/x86/boot.asm
 	@mkdir -p $(BIN_DIR)
 	$(ASM) -f bin $< -o $@
 

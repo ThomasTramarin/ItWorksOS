@@ -9,6 +9,12 @@ KERNEL_LOAD_SEG equ 0x1000      ; temporary Segment for ES (0x1000:0x0000)
 KERNEL_START_ADDR equ 0x10000   ; final physical memory destination (kernel)
 
 start:
+    mov dh, dl
+    jmp start2
+
+boot_drive: db 0
+
+start2:
     cli                 ; disable interrupts
 
     ; setup segments
@@ -18,6 +24,9 @@ start:
     mov ss, ax
     mov sp, 0x7C00      ; stack at bootloader top
 
+    ; save the boot drive number
+    mov [boot_drive], dh
+
     sti                 ; enable interrupts
 
 ; load the kernel
@@ -26,7 +35,7 @@ mov ax, KERNEL_LOAD_SEG
 xor bx, bx
 mov es, ax      ; ES:BX becomes the destination pointer (0x1000:0x0000 = 0x10000)
 
-mov dl, 0x80    ; first drive ID
+mov dl, [boot_drive]    ; first drive ID
 mov dh, 0x00    ; head = 0
 mov cl, 0x02    ; sector = 2 (sector 1 is the bootloader)
 mov ch, 0x00    ; cylinder 0
@@ -102,6 +111,17 @@ PModeMain:
     ; stack 0x90000
     mov ebp, 0x90000
     mov esp, ebp
+
+    ; build the boot_info struct and pass the pointer to kmain (cdecl)
+    mov ebx, ebp
+    mov byte [ebx+0], 'I'
+    mov byte [ebx+1], 'W'
+    mov byte [ebx+2], 'O'
+    mov byte [ebx+3], 'S'
+    mov al, [boot_drive]
+    mov byte [ebx + 4], al
+
+    push ebx
 
     ; far jump into the compiled kernel at 0x10000 
     jmp CODE_OFFSET:KERNEL_START_ADDR

@@ -1,6 +1,8 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-void kmain(void);
+#include <boot/boot_info.h>
+
+void kmain(boot_info_t *info);
 
 #endif
