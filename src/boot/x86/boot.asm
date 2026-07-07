@@ -112,7 +112,8 @@ PModeMain:
     mov ebp, 0x90000
     mov esp, ebp
 
-    ; build the boot_info struct and pass the pointer to kmain (cdecl)
+    ; build the boot_info struct
+    ; ebx contains the pointer to the struct
     mov ebx, ebp
     mov byte [ebx+0], 'I'
     mov byte [ebx+1], 'W'
@@ -120,8 +121,6 @@ PModeMain:
     mov byte [ebx+3], 'S'
     mov al, [boot_drive]
     mov byte [ebx + 4], al
-
-    push ebx
 
     ; far jump into the compiled kernel at 0x10000 
     jmp CODE_OFFSET:KERNEL_START_ADDR

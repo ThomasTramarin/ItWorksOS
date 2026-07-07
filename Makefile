@@ -14,8 +14,8 @@ KERNEL_SRC_DIR = $(SRC_DIR)/kernel
 # Compilation Flags
 FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -I$(KERNEL_SRC_DIR) -I$(INCLUDE_DIR)
 
-KERNEL_ENTRY_SRC = $(SRC_DIR)/kernel/kernel.asm
-KERNEL_ENTRY_OBJ = $(BUILD_DIR)/kernel/kernel.asm.o
+KERNEL_ENTRY_SRC = $(SRC_DIR)/kernel/arch/x86/kernel.asm
+KERNEL_ENTRY_OBJ = $(BUILD_DIR)/kernel/arch/x86/kernel.asm.o
 
 C_SOURCES   := $(shell find $(SRC_DIR) -name "*.c")
 ASM_SOURCES := $(shell find $(SRC_DIR) -name "*.asm" ! -name "kernel.asm" ! -path "$(SRC_DIR)/boot/*")

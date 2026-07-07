@@ -5,6 +5,8 @@ SECTIONS {
 
     .text : ALIGN(4096)
     {
+
+        *kernel.asm.o(.text)
         *(.text)
     }
 

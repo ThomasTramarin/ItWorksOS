@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include "kmain.h"
 #include "exceptions.h"
 #include "idt.h"
 #include "klib/cui.h"
@@ -29,7 +29,6 @@ void kmain(boot_info_t *info) {
   cui_puts("\nWelcome to ItWorksOnMyHP\n");
 
   while (1) {
-
     asm volatile("hlt");
   }
 }
