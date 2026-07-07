@@ -1,10 +1,10 @@
-#include "kmain.h"
-#include "exceptions.h"
-#include "idt.h"
-#include "klib/cui.h"
-#include "pic.h"
-#include "timer.h"
-#include "vga.h"
+#include <arch/x86/interrupts/exceptions.h>
+#include <arch/x86/interrupts/idt.h>
+#include <arch/x86/interrupts/pic.h>
+#include <arch/x86/timer/pit.h>
+#include <core/kmain.h>
+#include <drivers/video/vga/vga.h>
+#include <klib/cui.h>
 
 void kmain(boot_info_t *info) {
   cui_init(VGA_COLOR_WHITE, VGA_COLOR_BLUE, 0);

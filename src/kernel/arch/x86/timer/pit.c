@@ -1,8 +1,7 @@
-#include "timer.h"
-#include "io.h"
-#include "isr.h"
-#include "klib/time.h"
-#include "pic.h"
+#include <arch/x86/cpu/io.h>
+#include <arch/x86/interrupts/pic.h>
+#include <arch/x86/timer/pit.h>
+#include <klib/time.h>
 
 /**
  * @brief Timer driver (IRQ 0)

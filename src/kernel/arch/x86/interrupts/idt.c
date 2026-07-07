@@ -1,5 +1,5 @@
-#include "idt.h"
-#include "isr.h"
+#include <arch/x86/interrupts/idt.h>
+#include <arch/x86/interrupts/isr.h>
 
 static struct idt_entry idt[256];
 static struct idt_descriptor idt_ptr;

@@ -1,7 +1,7 @@
 #ifndef CUI_H
 #define CUI_H
 
-#include "../vga.h"
+#include <drivers/video/vga/vga.h>
 
 #define cui_klog(fmt, ...)                                                     \
   do {                                                                         \

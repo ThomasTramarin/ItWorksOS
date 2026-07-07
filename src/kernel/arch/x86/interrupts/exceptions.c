@@ -1,6 +1,6 @@
-#include "exceptions.h"
-#include "klib/cui.h"
-#include "vga.h"
+#include <arch/x86/interrupts/exceptions.h>
+#include <drivers/video/vga/vga.h>
+#include <klib/cui.h>
 
 void exceptions_init(void) {
   for (int i = 0; i < 32; i++) {

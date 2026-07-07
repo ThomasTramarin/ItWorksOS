@@ -1,7 +1,7 @@
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef PIT_H
+#define PIT_H
 
-#include "isr.h"
+#include <arch/x86/interrupts/isr.h>
 
 enum {
   TIMER_PIT_CH_0_PORT = 0x40,

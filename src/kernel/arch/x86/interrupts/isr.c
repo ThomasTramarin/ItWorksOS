@@ -1,8 +1,8 @@
-#include "isr.h"
-#include "idt.h"
-#include "io.h"
-#include "klib/cui.h"
-#include "pic.h"
+#include <arch/x86/cpu/io.h>
+#include <arch/x86/interrupts/idt.h>
+#include <arch/x86/interrupts/isr.h>
+#include <arch/x86/interrupts/pic.h>
+#include <klib/cui.h>
 
 void __attribute__((cdecl)) isr0(void);
 void __attribute__((cdecl)) isr1(void);

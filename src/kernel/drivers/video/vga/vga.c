@@ -1,5 +1,5 @@
-#include "vga.h"
-#include "io.h"
+#include <arch/x86/cpu/io.h>
+#include <drivers/video/vga/vga.h>
 
 static volatile struct vga_cell *text_buffer = (struct vga_cell *)VGA_MEM_ADDR;
 static struct vga_cell back_buffer[VGA_ROWS * VGA_COLS];

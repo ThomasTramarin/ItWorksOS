@@ -1,5 +1,5 @@
-#include "pic.h"
-#include "io.h"
+#include <arch/x86/cpu/io.h>
+#include <arch/x86/interrupts/pic.h>
 
 typedef enum {
   PIC1_COMMAND_PORT = 0x20,
