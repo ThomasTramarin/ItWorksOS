@@ -9,39 +9,50 @@ BIN_DIR        = ./bin
 BUILD_DIR      = ./build
 SRC_DIR        = ./src
 INCLUDE_DIR    = ./include
+BOOT_SRC_DIR   = $(SRC_DIR)/boot/x86
 KERNEL_SRC_DIR = $(SRC_DIR)/kernel
+
+# Target Outputs
+DISK_IMG = $(BIN_DIR)/disk.img
+KERNEL_BIN = $(BIN_DIR)/kernel.bin
+MBR_BIN    = $(BUILD_DIR)/mbr.bin
+VBR_BIN    = $(BUILD_DIR)/fat32_vbr.bin
 
 # Compilation Flags
 FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -I$(KERNEL_SRC_DIR) -I$(INCLUDE_DIR)
 
+# Kernel Entry
 KERNEL_ENTRY_SRC = $(SRC_DIR)/kernel/arch/x86/kernel.asm
 KERNEL_ENTRY_OBJ = $(BUILD_DIR)/kernel/arch/x86/kernel.asm.o
 
+# Automatic src discovery (isolates kernel from boot)
 C_SOURCES   := $(shell find $(SRC_DIR) -name "*.c")
-ASM_SOURCES := $(shell find $(SRC_DIR) -name "*.asm" ! -name "kernel.asm" ! -path "$(SRC_DIR)/boot/*")
+ASM_SOURCES := $(shell find $(KERNEL_SRC_DIR) -name "*.asm" ! -name "kernel.asm")
 
 C_OBJECTS   := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(C_SOURCES))
 ASM_OBJECTS := $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/%.asm.o, $(ASM_SOURCES))
 
-# Object Files
-FILES = $(KERNEL_ENTRY_OBJ) $(ASM_OBJECTS) $(C_OBJECTS)
+KERNEL_FILES = $(KERNEL_ENTRY_OBJ) $(ASM_OBJECTS) $(C_OBJECTS)
 
-.PHONY: all clean
+.PHONY: all clean run
 
-all: $(BIN_DIR)/os.bin
-	@echo "--- [IwomhOS] Compilation completed successfully ---"
+all: $(DISK_IMG)
+	@echo "--- [IwomhOS] Disk image created successfully ---"
 
-# Merge bootloader and kernel binaries, then truncate the image to 50K
-$(BIN_DIR)/os.bin: $(BIN_DIR)/boot.bin $(BIN_DIR)/kernel.bin
-	@mkdir -p $(BIN_DIR)
-	dd if=$(BIN_DIR)/boot.bin of=$@ bs=512 conv=notrunc 2>/dev/null
-	dd if=$(BIN_DIR)/kernel.bin of=$@ bs=512 seek=1 conv=notrunc 2>/dev/null
-	truncate -s 50K $@
+# --- BOOTLOADER RULES ---
+NASM_FLAGS = -I$(BOOT_SRC_DIR)/ -I$(BOOT_SRC_DIR)/mbr/ -I$(BOOT_SRC_DIR)/vbr/
 
-# Compile the Bootloader (16-bit Assembly)
-$(BIN_DIR)/boot.bin: $(SRC_DIR)/boot/x86/boot.asm
-	@mkdir -p $(BIN_DIR)
-	$(ASM) -f bin $< -o $@
+$(MBR_BIN): $(BOOT_SRC_DIR)/mbr/mbr.asm
+	@mkdir -p $(dir $@)
+	@echo "Assembling MBR"
+	$(ASM) -f bin -g $(NASM_FLAGS) $< -o $@
+
+$(VBR_BIN): $(BOOT_SRC_DIR)/vbr/fat32_vbr.asm
+		@mkdir -p $(dir $@)
+		@echo "Assembling VBR"
+		$(ASM) -f bin -g $(NASM_FLAGS) $< -o $@
+
+# --- KERNEL BUILD RULES ---
 
 # Compile the Kernel entry point (32-bit Assembly)
 $(KERNEL_ENTRY_OBJ): $(KERNEL_ENTRY_SRC)
@@ -59,15 +70,35 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(FLAGS) -std=gnu99 -c $< -o $@
 
 # 5. Relocatable link (merges Kernel Assembly and C objects)
-$(BUILD_DIR)/completeKernel.o: $(FILES)
-	$(LD) -g -relocatable $(FILES) -o $@
+$(BUILD_DIR)/completeKernel.o: $(KERNEL_FILES)
+	@mkdir -p $(dir $@)
+	$(LD) -g -relocatable $(KERNEL_FILES) -o $@
 
 # 6. Final link phase using the linker script
 $(BIN_DIR)/kernel.bin: $(BUILD_DIR)/completeKernel.o $(LINKER_SCRIPT)
-	$(CC) $(FLAGS) -T $(LINKER_SCRIPT) -o $@ -ffreestanding -O0 -nostdlib $<
+	@mkdir -p $(dir $@)
+	@echo "Linking Kernel..."
+	$(CC) $(FLAGS) -T linker.ld -o $@ -ffreestanding -O0 -nostdlib $<
 
-# CLEANUP
+# --- DISK IMAGE GENERATION ---
+# NOTE: currently the kernel is not saved on disk
+$(DISK_IMG): $(MBR_BIN) $(VBR_BIN) 
+	@mkdir -p $(BIN_DIR)
+	@echo "Allocating 128 MB raw disk image..."
+	@dd if=/dev/null of=$(DISK_IMG) bs=1M seek=128 2>/dev/null
+
+	@echo "Writing MBR to Sector 0..."
+	@dd if=$(MBR_BIN) of=$(DISK_IMG) bs=512 count=1 conv=notrunc 2>/dev/null
+
+	@echo "Writing VBR to Sector 2048 (LBA)..."
+	@dd if=$(VBR_BIN) of=$(DISK_IMG) bs=512 seek=2048 conv=notrunc 2>/dev/null
+
+
+# --- UTILITIES ---
 clean:
 	rm -rf $(BIN_DIR)/*
 	rm -rf $(BUILD_DIR)/*
-	@echo "--- [IwomhOS] Build and bin directories cleaned ---"
+	@echo "--- [IwomhOS] Cleaned build environment ---"
+
+run: all
+	qemu-system-i386 -hda $(DISK_IMG)
