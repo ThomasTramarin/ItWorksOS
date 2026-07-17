@@ -9,14 +9,18 @@ BIN_DIR        = ./bin
 BUILD_DIR      = ./build
 SRC_DIR        = ./src
 INCLUDE_DIR    = ./include
+TOOLS_DIR      = ./tools
+MKIMAGE_DIR = $(TOOLS_DIR)/mkimage
+MKIMAGE_BIN = $(BUILD_DIR)/tools/mkimage/mkimage
 BOOT_SRC_DIR   = $(SRC_DIR)/boot/x86
 KERNEL_SRC_DIR = $(SRC_DIR)/kernel
+FILES_LIST = ./disk.files
 
 # Target Outputs
-DISK_IMG = $(BIN_DIR)/disk.img
-KERNEL_BIN = $(BIN_DIR)/kernel.bin
-MBR_BIN    = $(BUILD_DIR)/mbr.bin
-VBR_BIN    = $(BUILD_DIR)/fat32_vbr.bin
+DISK_IMG 	= $(BIN_DIR)/disk.img
+KERNEL_BIN 	= $(BIN_DIR)/kernel.bin
+MBR_BIN    	= $(BUILD_DIR)/mbr.bin
+VBR_BIN    	= $(BUILD_DIR)/fat32_vbr.bin
 
 # Compilation Flags
 FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -I$(KERNEL_SRC_DIR) -I$(INCLUDE_DIR)
@@ -36,8 +40,13 @@ KERNEL_FILES = $(KERNEL_ENTRY_OBJ) $(ASM_OBJECTS) $(C_OBJECTS)
 
 .PHONY: all clean run
 
-all: $(DISK_IMG)
+all: $(MKIMAGE_BIN) $(DISK_IMG)
 	@echo "--- [IwomhOS] Disk image created successfully ---"
+
+# --- HOST TOOLS ---
+$(MKIMAGE_BIN):
+	@echo "Building mkimage..."
+	$(MAKE) -C $(MKIMAGE_DIR)
 
 # --- BOOTLOADER RULES ---
 NASM_FLAGS = -I$(BOOT_SRC_DIR)/ -I$(BOOT_SRC_DIR)/mbr/ -I$(BOOT_SRC_DIR)/vbr/
@@ -81,18 +90,15 @@ $(BIN_DIR)/kernel.bin: $(BUILD_DIR)/completeKernel.o $(LINKER_SCRIPT)
 	$(CC) $(FLAGS) -T linker.ld -o $@ -ffreestanding -O0 -nostdlib $<
 
 # --- DISK IMAGE GENERATION ---
-# NOTE: currently the kernel is not saved on disk
 $(DISK_IMG): $(MBR_BIN) $(VBR_BIN) 
 	@mkdir -p $(BIN_DIR)
-	@echo "Allocating 128 MB raw disk image..."
-	@dd if=/dev/null of=$(DISK_IMG) bs=1M seek=128 2>/dev/null
+	@echo "Generating disk image..."
 
-	@echo "Writing MBR to Sector 0..."
-	@dd if=$(MBR_BIN) of=$(DISK_IMG) bs=512 count=1 conv=notrunc 2>/dev/null
-
-	@echo "Writing VBR to Sector 2048 (LBA)..."
-	@dd if=$(VBR_BIN) of=$(DISK_IMG) bs=512 seek=2048 conv=notrunc 2>/dev/null
-
+	$(MKIMAGE_BIN) \
+		$(MBR_BIN) \
+		$(VBR_BIN) \
+		$(DISK_IMG) \
+		$(FILES_LIST)
 
 # --- UTILITIES ---
 clean:

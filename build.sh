@@ -10,4 +10,4 @@ echo "--- [IwomhOS] Cross-compiler toolchain loaded ---"
 
 make clean
 
-make all
+make run
