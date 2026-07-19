@@ -21,6 +21,7 @@ DISK_IMG 	= $(BIN_DIR)/disk.img
 KERNEL_BIN 	= $(BIN_DIR)/kernel.bin
 MBR_BIN    	= $(BUILD_DIR)/mbr.bin
 VBR_BIN    	= $(BUILD_DIR)/fat32_vbr.bin
+STAGE2_BIN  = $(BUILD_DIR)/stage2.bin
 
 # Compilation Flags
 FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -I$(KERNEL_SRC_DIR) -I$(INCLUDE_DIR)
@@ -61,6 +62,11 @@ $(VBR_BIN): $(BOOT_SRC_DIR)/vbr/fat32_vbr.asm
 		@echo "Assembling VBR"
 		$(ASM) -f bin -g $(NASM_FLAGS) $< -o $@
 
+$(STAGE2_BIN): $(BOOT_SRC_DIR)/stage2/stage2.asm
+		@mkdir -p $(dir $@)
+		@echo "Assembling Stage 2"
+		$(ASM) -f bin -g $(NASM_FLAGS) $< -o $@
+
 # --- KERNEL BUILD RULES ---
 
 # Compile the Kernel entry point (32-bit Assembly)
@@ -90,7 +96,7 @@ $(BIN_DIR)/kernel.bin: $(BUILD_DIR)/completeKernel.o $(LINKER_SCRIPT)
 	$(CC) $(FLAGS) -T linker.ld -o $@ -ffreestanding -O0 -nostdlib $<
 
 # --- DISK IMAGE GENERATION ---
-$(DISK_IMG): $(MBR_BIN) $(VBR_BIN) 
+$(DISK_IMG): $(MBR_BIN) $(VBR_BIN) $(STAGE2_BIN)
 	@mkdir -p $(BIN_DIR)
 	@echo "Generating disk image..."
 
