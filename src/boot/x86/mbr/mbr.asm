@@ -32,12 +32,15 @@ mbr_stage:
     push si
 
     ; LBA start field is at offset 8 of the entry
-    mov ax, [ds:si + 8] 
-    mov bx, [ds:si + 10]
+    mov eax, [ds:si + 8] 
 
     mov si, 0x500   ; VBR will be loaded at 0x0000:0x0500
     mov cx, 1
     mov dl, [boot_drive]
+
+    call disk_check_lba_extensions
+    jc .err_lba_ext
+
     call disk_read_lba
 
     jc .err_vbr_load_error
@@ -60,6 +63,10 @@ mbr_stage:
     call video_print_string
     jmp .halt
 
+.err_lba_ext:
+    mov si, msg_no_lba_extensions
+    call video_print_string
+    jmp .halt
 
 .halt:
     hlt
@@ -67,12 +74,14 @@ mbr_stage:
 
 %include "mbr/partition.asm"
 %include "video.asm"
-%include "disk.asm"
+%include "disk_read.asm"
+%include "disk_check.asm"
 
 ; data
 boot_drive: db 0
 msg_no_active_partition: db 'Boot failed (MBR): no active partition found', 0xD, 0xA, 0
 msg_vbr_load_error: db 'Boot failed (MBR): failed to load VBR sector', 0xD, 0xA, 0
+msg_no_lba_extensions db 'Boot Failed (MBR): the BIOS does not support BIOS extensions', 0xD, 0xA, 0
 
 times 446 - ($-$$) db 0 
 
