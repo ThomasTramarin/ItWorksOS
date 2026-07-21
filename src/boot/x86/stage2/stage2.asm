@@ -31,6 +31,11 @@ stage2_context:
 .bytes_per_cluster:
     dd 0
 
+
+; Error Strings
+msg_err_prefix: db 'Boot failed (Stage2): ', 0
+msg_err_disk_read: db 'ERR_DISK_READ', 0
+
 %include "memory.asm"
 %include "video.asm"
 %include "disk_read.asm"
@@ -96,3 +101,20 @@ stage2_init:
     popa
     ret
 
+; FUNC: 
+; Input:
+;   - SI: the error string to print
+; Output: None (this function never retruns, it enters an infinte loop)
+stage2_error:
+    push si
+
+    mov si, msg_err_prefix
+    call video_print_string
+
+    pop si
+    call video_print_string
+
+.halt:
+    cli
+    hlt
+    jmp .halt
