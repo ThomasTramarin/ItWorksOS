@@ -50,7 +50,7 @@ $(MKIMAGE_BIN):
 	$(MAKE) -C $(MKIMAGE_DIR)
 
 # --- BOOTLOADER RULES ---
-NASM_FLAGS = -I$(BOOT_SRC_DIR)/ -I$(BOOT_SRC_DIR)/mbr/ -I$(BOOT_SRC_DIR)/vbr/
+NASM_FLAGS = -I$(BOOT_SRC_DIR)/ -I$(BOOT_SRC_DIR)/mbr/ -I$(BOOT_SRC_DIR)/vbr/ -I$(BOOT_SRC_DIR)/stage2/
 
 $(MBR_BIN): $(BOOT_SRC_DIR)/mbr/mbr.asm
 	@mkdir -p $(dir $@)
