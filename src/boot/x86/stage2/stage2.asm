@@ -6,6 +6,8 @@
 stage2_entry:
     call stage2_init
 
+    call stage2_validate
+
 halt:
     hlt
     jmp halt
@@ -34,7 +36,11 @@ stage2_context:
 
 ; Error Strings
 msg_err_prefix: db 'Boot failed (Stage2): ', 0
+msg_err_not_fat32_lba: db 'ERR_NOT_FAT32_LBA', 0
 msg_err_disk_read: db 'ERR_DISK_READ', 0
+msg_err_boot_indicator: db 'ERR_BOOT_INDICATOR', 0
+msg_err_hidden_sectors_mismatch: db 'ERR_HIDDEN_SECTORS_MISMATCH', 0 
+msg_err_invalid_hidden_sectors: db 'ERR_INVALID_HIDDEN_SECTORS', 0
 
 %include "memory.asm"
 %include "video.asm"
@@ -86,8 +92,9 @@ stage2_init:
     mov [stage2_context.bytes_per_cluster], eax
 
     ; calculate fat_start_lba
+    mov eax, [stage2_context.bpb + FAT32_BPB_HIDDEN_SECTORS_OFF]
     movzx ebx, word [stage2_context.bpb + FAT32_BPB_RESERVED_SECTORS_COUNT_OFF]
-    imul eax, ebx ; EAX (fat_start_lba) = bytes_per_cluster * reserved_sectors_count 
+    add eax, ebx ; EAX (fat_start_lba) = hidden_sectors + reserved_sectors_count 
     mov [stage2_context.fat_start_lba], eax
 
     ; calculate data_start_lba
@@ -101,7 +108,7 @@ stage2_init:
     popa
     ret
 
-; FUNC: 
+; FUNC: prints the error string to the terminal and halts the CPU
 ; Input:
 ;   - SI: the error string to print
 ; Output: None (this function never retruns, it enters an infinte loop)
@@ -118,3 +125,51 @@ stage2_error:
     cli
     hlt
     jmp .halt
+
+
+; FUNC: validates MBR and FAT32 formats
+; Input: None
+; Output: None (automatically calls stage2_error function if error, otherwise, it returns)
+stage2_validate:
+    pusha
+
+    ; Check MBR partition bootable flag (should be 0x80 on active partition)
+    mov al, [stage2_context.mbr_partition_entry + MBR_PARTITION_BOOT_INDICATOR_OFF]
+    cmp al, 0x80
+    jne .err_boot_indicator
+
+    ; Check MBR partition type (should be FAT32 LBA -> 0x0C)
+    mov al, [stage2_context.mbr_partition_entry + MBR_PARTITION_TYPE_OFF]
+    cmp al, 0x0C
+    jne .err_not_fat32_lba
+
+    ; bpb_hidden_sectors should be equal to mbr_start_lba
+    mov eax, [stage2_context.mbr_partition_entry + MBR_PARTITION_LBA_START_OFF]
+    mov ebx, [stage2_context.bpb + FAT32_BPB_HIDDEN_SECTORS_OFF]
+    cmp eax, ebx    ; lba_start == hidden_sectors ?
+    jne .err_hidden_sectors_mismatch
+
+    ; mbr_start_lba (and hidden_sectors) should not be 0
+    mov eax, [stage2_context.mbr_partition_entry + MBR_PARTITION_LBA_START_OFF]
+    cmp eax, 0
+    je .err_invalid_hidden_sectors
+
+    popa
+    ret ; return on success
+
+
+.err_boot_indicator:
+    mov si, msg_err_boot_indicator
+    jmp stage2_error
+
+.err_not_fat32_lba:
+    mov si, msg_err_not_fat32_lba
+    jmp stage2_error
+
+.err_hidden_sectors_mismatch:
+    mov si, msg_err_hidden_sectors_mismatch
+    jmp stage2_error
+
+.err_invalid_hidden_sectors:
+    mov si, msg_err_invalid_hidden_sectors
+    jmp stage2_error
