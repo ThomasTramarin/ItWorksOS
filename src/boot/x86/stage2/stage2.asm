@@ -246,3 +246,41 @@ stage2_validate:
 .err_fat_size_32:
     mov si, msg_err_fat_size_32 
     jmp stage2_error
+
+; FUNC: converts a FAT32 cluster number to its corresponding LBA address
+; Input:
+;   - EAX = Cluster number (must be >= 2)
+; Output:
+;   - EAX = Starting LBA address of the cluster
+fat32_cluster_to_lba:
+    push ebx
+
+    sub eax, 2
+    movzx ebx, byte [stage2_context.bpb + FAT32_BPB_SECTORS_PER_CLUSTER_OFF]
+    imul eax, ebx
+    add eax, [stage2_context.data_start_lba]
+
+    pop ebx
+    ret
+
+; FUNC: reads a FAT32 cluster into RAM
+; Input:
+;   - EAX = Cluster number
+;   - ES:SI = Destination buffer in RAM
+; Output:
+;   - CF = 0 (success), 1 (failure)
+stage2_read_cluster:
+    push cx
+    push edx
+
+    mov dl, [stage2_context.boot_drive]
+
+    call fat32_cluster_to_lba
+
+    movzx cx, byte [stage2_context.bpb + FAT32_BPB_SECTORS_PER_CLUSTER_OFF] ; sectors to read
+
+    call disk_read_lba
+
+    pop edx
+    pop cx
+    ret
