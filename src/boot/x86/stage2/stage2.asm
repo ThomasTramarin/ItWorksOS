@@ -1,8 +1,14 @@
 [org 0x0700]
 [bits 16]
 
+; Stage2 Bootloader Code
+; Responsibilities:
+;   - Save previous boot stages information
+;   - Validate the format of MBR partition and VBR parameters 
+
 %include "constants.asm"
 
+; --- Entry Point ---
 stage2_entry:
     call stage2_init
 
@@ -12,46 +18,8 @@ halt:
     hlt
     jmp halt
 
-;data
 
-; this structure is passed to stage2 functions
-stage2_context:
-.boot_drive:
-    db 0
-.mbr_partition_entry:
-    times 16 db 0
-.bpb:
-    times 25 db 0
-.ebpb:
-    times 54 db 0
-
-; calculated values
-.fat_start_lba:
-    dd 0
-.data_start_lba:
-    dd 0
-.bytes_per_cluster:
-    dd 0
-
-
-; Error Strings
-msg_err_prefix: db 'Boot failed (Stage2): ', 0
-msg_err_not_fat32_lba: db 'ERR_NOT_FAT32_LBA', 0
-msg_err_disk_read: db 'ERR_DISK_READ', 0
-msg_err_boot_indicator: db 'ERR_BOOT_INDICATOR', 0
-msg_err_hidden_sectors_mismatch: db 'ERR_HIDDEN_SECTORS_MISMATCH', 0 
-msg_err_invalid_hidden_sectors: db 'ERR_INVALID_HIDDEN_SECTORS', 0
-msg_err_bytes_per_sector:     db 'ERR_INVALID_BYTES_PER_SECTOR', 0
-msg_err_sectors_per_cluster:  db 'ERR_INVALID_SECTORS_PER_CLUSTER', 0
-msg_err_number_fats:          db 'ERR_INVALID_NUMBER_FATS', 0
-msg_err_root_cluster:         db 'ERR_INVALID_ROOT_CLUSTER', 0
-msg_err_total_sectors_16: db 'ERR_INVALID_TOTAL_SECTORS_16', 0
-msg_err_total_sectors_32: db 'ERR_INVALID_TOTAL_SECTORS_32', 0
-msg_err_fat_size_32: db 'ERR_INVALID_FAT_SIZE_32', 0
-
-%include "memory.asm"
-%include "video.asm"
-%include "disk_read.asm"
+; --- Functions ---
 
 ; FUNC: initializes the stage2_context structure
 ; Input:
@@ -284,3 +252,41 @@ stage2_read_cluster:
     pop edx
     pop cx
     ret
+
+%include "memory.asm"
+%include "video.asm"
+%include "disk_read.asm"
+
+
+; --- Data Section & Buffers
+
+; this structure is used by stage2 functions
+; stage2_init will populate this structure
+stage2_context:
+    ; previous-stages data
+    .boot_drive:                    db 0
+    .mbr_partition_entry:           times 16 db 0
+    .bpb:                           times 25 db 0
+    .ebpb:                          times 54 db 0
+
+    ; calculated values
+    .fat_start_lba:                 dd 0
+    .data_start_lba:                dd 0
+    .bytes_per_cluster:             dd 0
+
+
+; Error Strings
+msg_err_prefix:                     db 'Boot failed (Stage2): ', 0
+
+msg_err_not_fat32_lba:              db 'ERR_NOT_FAT32_LBA', 0
+msg_err_disk_read:                  db 'ERR_DISK_READ', 0
+msg_err_boot_indicator:             db 'ERR_BOOT_INDICATOR', 0
+msg_err_hidden_sectors_mismatch:    db 'ERR_HIDDEN_SECTORS_MISMATCH', 0 
+msg_err_invalid_hidden_sectors:     db 'ERR_INVALID_HIDDEN_SECTORS', 0
+msg_err_bytes_per_sector:           db 'ERR_INVALID_BYTES_PER_SECTOR', 0
+msg_err_sectors_per_cluster:        db 'ERR_INVALID_SECTORS_PER_CLUSTER', 0
+msg_err_number_fats:                db 'ERR_INVALID_NUMBER_FATS', 0
+msg_err_root_cluster:               db 'ERR_INVALID_ROOT_CLUSTER', 0
+msg_err_total_sectors_16:           db 'ERR_INVALID_TOTAL_SECTORS_16', 0
+msg_err_total_sectors_32:           db 'ERR_INVALID_TOTAL_SECTORS_32', 0
+msg_err_fat_size_32:                db 'ERR_INVALID_FAT_SIZE_32', 0
