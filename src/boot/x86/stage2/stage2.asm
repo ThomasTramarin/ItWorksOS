@@ -41,6 +41,13 @@ msg_err_disk_read: db 'ERR_DISK_READ', 0
 msg_err_boot_indicator: db 'ERR_BOOT_INDICATOR', 0
 msg_err_hidden_sectors_mismatch: db 'ERR_HIDDEN_SECTORS_MISMATCH', 0 
 msg_err_invalid_hidden_sectors: db 'ERR_INVALID_HIDDEN_SECTORS', 0
+msg_err_bytes_per_sector:     db 'ERR_INVALID_BYTES_PER_SECTOR', 0
+msg_err_sectors_per_cluster:  db 'ERR_INVALID_SECTORS_PER_CLUSTER', 0
+msg_err_number_fats:          db 'ERR_INVALID_NUMBER_FATS', 0
+msg_err_root_cluster:         db 'ERR_INVALID_ROOT_CLUSTER', 0
+msg_err_total_sectors_16: db 'ERR_INVALID_TOTAL_SECTORS_16', 0
+msg_err_total_sectors_32: db 'ERR_INVALID_TOTAL_SECTORS_32', 0
+msg_err_fat_size_32: db 'ERR_INVALID_FAT_SIZE_32', 0
 
 %include "memory.asm"
 %include "video.asm"
@@ -133,6 +140,8 @@ stage2_error:
 stage2_validate:
     pusha
 
+    ; --- MBR partition validation ---
+
     ; Check MBR partition bootable flag (should be 0x80 on active partition)
     mov al, [stage2_context.mbr_partition_entry + MBR_PARTITION_BOOT_INDICATOR_OFF]
     cmp al, 0x80
@@ -150,9 +159,45 @@ stage2_validate:
     jne .err_hidden_sectors_mismatch
 
     ; mbr_start_lba (and hidden_sectors) should not be 0
-    mov eax, [stage2_context.mbr_partition_entry + MBR_PARTITION_LBA_START_OFF]
     cmp eax, 0
     je .err_invalid_hidden_sectors
+
+    ; --- BPB validation ---
+
+    ; bytes_per_sectors should be 512 (BIOS compatibility and semplicity)
+    mov ax, [stage2_context.bpb + FAT32_BPB_BYTES_PER_SECTOR_OFF]
+    cmp ax, 512
+    jne .err_bytes_per_sector
+
+    ; sectors_per_cluster should not be 0
+    mov al, [stage2_context.bpb + FAT32_BPB_SECTORS_PER_CLUSTER_OFF]
+    cmp al, 0
+    je .err_sectors_per_cluster
+
+    ; number_fats should not be 0
+    mov al, [stage2_context.bpb + FAT32_BPB_NUMBER_FATS_OFF]
+    cmp al, 0
+    je .err_number_fats
+
+    ; root_cluster should be >= 2
+    mov eax, [stage2_context.ebpb + FAT32_EBPB_ROOT_CLUSTER_OFF]
+    cmp eax, 2
+    jb .err_root_cluster           
+
+    ; total_sectors_16 should be 0 (on FAT32)
+    mov ax, [stage2_context.bpb + FAT32_BPB_TOTAL_SECTORS_16_OFF]
+    cmp ax, 0
+    jne .err_total_sectors_16
+
+    ; total_sectors_32 should be > 0 (on FAT32)
+    mov eax, [stage2_context.bpb + FAT32_BPB_TOTAL_SECTORS_32_OFF]
+    cmp eax, 0
+    je .err_total_sectors_32
+
+    ; fat_size_32 should be > 0
+    mov eax, [stage2_context.ebpb + FAT32_EBPB_FAT_SIZE_32_OFF]
+    cmp eax, 0
+    je .err_fat_size_32
 
     popa
     ret ; return on success
@@ -172,4 +217,32 @@ stage2_validate:
 
 .err_invalid_hidden_sectors:
     mov si, msg_err_invalid_hidden_sectors
+    jmp stage2_error
+
+.err_bytes_per_sector:
+    mov si, msg_err_bytes_per_sector
+    jmp stage2_error
+
+.err_sectors_per_cluster:
+    mov si, msg_err_sectors_per_cluster
+    jmp stage2_error
+
+.err_number_fats:
+    mov si, msg_err_number_fats
+    jmp stage2_error
+
+.err_root_cluster:
+    mov si, msg_err_root_cluster
+    jmp stage2_error
+
+.err_total_sectors_16:
+    mov si, msg_err_total_sectors_16
+    jmp stage2_error
+
+.err_total_sectors_32:
+    mov si, msg_err_total_sectors_32
+    jmp stage2_error
+
+.err_fat_size_32:
+    mov si, msg_err_fat_size_32 
     jmp stage2_error
