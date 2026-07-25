@@ -96,7 +96,7 @@ $(BIN_DIR)/kernel.bin: $(BUILD_DIR)/completeKernel.o $(LINKER_SCRIPT)
 	$(CC) $(FLAGS) -T linker.ld -o $@ -ffreestanding -O0 -nostdlib $<
 
 # --- DISK IMAGE GENERATION ---
-$(DISK_IMG): $(MBR_BIN) $(VBR_BIN) $(STAGE2_BIN)
+$(DISK_IMG): $(MBR_BIN) $(VBR_BIN) $(STAGE2_BIN) $(KERNEL_BIN)
 	@mkdir -p $(BIN_DIR)
 	@echo "Generating disk image..."
 

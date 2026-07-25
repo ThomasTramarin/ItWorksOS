@@ -1,1 +1,2 @@
 build/stage2.bin:boot/stage2.bin
+bin/kernel.bin:boot/kernel.bin
