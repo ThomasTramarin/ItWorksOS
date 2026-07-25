@@ -31,3 +31,28 @@ FAT32_EBPB_BOOT_SIGNATURE_OFF         equ 0x1E
 FAT32_EBPB_VOL_ID_OFF                 equ 0x1F
 FAT32_EBPB_VOL_LABEL_OFF              equ 0x23
 FAT32_EBPB_FS_TYPE_OFF                equ 0x2E
+
+; FAT32 Directory Entry offsets
+FAT32_DIR_NAME_OFF                  equ 0x00
+FAT32_DIR_ATTRIBUTES_OFF            equ 0x0B
+FAT32_DIR_NT_RESERVED_OFF           equ 0x0C
+FAT32_DIR_CREATION_TIME_TENTHS_OFF  equ 0x0D
+FAT32_DIR_CREATION_TIME_OFF         equ 0x0E
+FAT32_DIR_CREATION_DATE_OFF         equ 0x10
+FAT32_DIR_ACCESS_DATE_OFF           equ 0x12
+FAT32_DIR_CLUSTER_HIGH_OFF          equ 0x14
+FAT32_DIR_WRITE_TIME_OFF            equ 0x16
+FAT32_DIR_WRITE_DATE_OFF            equ 0x18
+FAT32_DIR_CLUSTER_LOW_OFF           equ 0x1A
+FAT32_DIR_FILE_SIZE_OFF             equ 0x1C
+
+FAT32_DIR_ENTRY_SIZE                equ 32
+
+GDT_CODE_OFFSET                     equ 0x8
+GDT_DATA_OFFSET                     equ 0x10
+
+KERNEL_LOAD_ADDR                    equ 0x10000
+KERNEL_LOAD_SEG                     equ 0x1000
+KERNEL_LOAD_OFF                     equ 0x0000
+
+STACK_ADDR                          equ 0x80000
