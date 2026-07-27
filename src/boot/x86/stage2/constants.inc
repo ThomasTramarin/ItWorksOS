@@ -56,3 +56,5 @@ KERNEL_LOAD_SEG                     equ 0x1000
 KERNEL_LOAD_OFF                     equ 0x0000
 
 STACK_ADDR                          equ 0x80000
+
+BOOT_MAGIC equ 0x54425749

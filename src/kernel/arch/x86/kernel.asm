@@ -5,6 +5,7 @@ extern kmain
 _start:
 
     push ebx    ; pointer to boot_info (cdecl)
+    push eax    ; magic value
     call kmain
 
     jmp .halt

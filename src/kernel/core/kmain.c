@@ -1,3 +1,4 @@
+#include "boot/boot_info.h"
 #include <arch/x86/interrupts/exceptions.h>
 #include <arch/x86/interrupts/idt.h>
 #include <arch/x86/interrupts/pic.h>
@@ -6,11 +7,25 @@
 #include <drivers/video/vga/vga.h>
 #include <klib/cui.h>
 
-void kmain(boot_info_t *info) {
+void kmain(uint32_t magic, boot_info_t *info) {
   cui_init(VGA_COLOR_WHITE, VGA_COLOR_BLUE, 0);
 
-  cui_klog("Boot info: %c%c%c%c (magic), 0x%x (boot_drive)\n", info->magic[0],
-           info->magic[1], info->magic[2], info->magic[3], info->boot_drive);
+  if (magic != BOOT_MAGIC) {
+    cui_printf("Error: invalid magic. System Halted\n");
+    goto halt;
+  }
+
+  cui_klog("Memory Map:\n");
+  for (uint32_t i = 0; i < info->memory_map_count; i++) {
+    boot_mem_map_entry_t entry = info->memory_map_ptr[i];
+
+    uint32_t base_low = (uint32_t)entry.base;
+    uint32_t len_low = (uint32_t)entry.length;
+
+    cui_klog("\t%d. Base: 0x%x, Length: 0x%x, Type: %x, Attr: %x\n", i,
+             base_low, len_low, entry.type, entry.attr);
+  }
+
   idt_init();
   cui_klog("IDT and ISR configurated.\n");
 
@@ -28,6 +43,7 @@ void kmain(boot_info_t *info) {
 
   cui_puts("\nWelcome to ItWorksOnMyHP\n");
 
+halt:
   while (1) {
     asm volatile("hlt");
   }

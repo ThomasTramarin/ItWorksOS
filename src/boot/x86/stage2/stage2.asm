@@ -45,10 +45,24 @@ stage2_entry:
     call fat32_load_file
     jc .err_disk_read
 
+    ; save memory map into memory
+    xor ax, ax
+    mov es, ax
+    mov di, e820_buffer
+    call e820_get_memory_map
+    jc .err_e820
+    mov [e820_count], cx
+
+    call stage2_boot_info_init
+
     jmp stage2_enter_protected_mode
 
 .err_disk_read:
     mov si, msg_err_disk_read
+    jmp stage2_error
+
+.err_e820:
+    mov si, msg_err_e820
     jmp stage2_error
 
 .halt:
@@ -563,10 +577,27 @@ fat32_load_file:
 
     ret
 
+; FUNC: initializes boot_info structure stored on stage2 data memory
+; Input: None
+; Output: None
+stage2_boot_info_init:
+    push ax
+
+    ; e820 count
+    mov ax, [e820_count]
+    mov [boot_info.memory_map_count], ax
+
+    ; e820 pointer
+    mov dword [boot_info.memory_map_ptr], e820_buffer
+
+    pop ax
+    ret
+
 
 %include "memory.asm"
 %include "video.asm"
 %include "disk_read.asm"
+%include "e820.asm"
 
 
 
@@ -599,8 +630,16 @@ protected_mode_main:
     mov ss, ax
     mov gs, ax
 
+    ; Stack setup
     mov ebp, STACK_ADDR
     mov esp, ebp
+
+
+    ; save magic on eax ('IWBT' in little-endian)
+    mov eax, BOOT_MAGIC
+
+    ; save boot_info on ebx, then kernel.asm will pass it
+    mov ebx, boot_info 
 
     ; far jump into the compiled kernel
     jmp GDT_CODE_OFFSET:KERNEL_LOAD_ADDR
@@ -638,6 +677,7 @@ msg_err_root_cluster:               db 'ERR_INVALID_ROOT_CLUSTER', 0
 msg_err_total_sectors_16:           db 'ERR_INVALID_TOTAL_SECTORS_16', 0
 msg_err_total_sectors_32:           db 'ERR_INVALID_TOTAL_SECTORS_32', 0
 msg_err_fat_size_32:                db 'ERR_INVALID_FAT_SIZE_32', 0
+msg_err_e820:                       db 'ERR_E820_MEMORY_MAP'
 
 ; FAT32 filenames
 boot_dir: db 'BOOT       '
@@ -675,3 +715,13 @@ gdt_end:
 gdt_descriptor:
     dw gdt_end - gdt_start - 1
     dd gdt_start
+
+e820_buffer:
+    times (64 * 24) db 0    ; 64 = max number of E820 supported entries, 24 = entry size
+e820_count:
+    dw 0
+
+; boot_info structure passed to the kmain function as a pointer
+boot_info:
+    .memory_map_count:    dw 0        ; E820 entries count (2 bytes)
+    .memory_map_ptr:   dd 0        ; physical RAM pointer to the first E820 entry (4 bytes)
