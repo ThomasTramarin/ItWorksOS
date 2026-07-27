@@ -1,6 +1,6 @@
 # x86 Bootloader
 
-A custom multi-stage x86 bootloader for **IwomhOS**.
+A custom multi-stage x86 bootloader for **IWOS**.
 
 ## Overview
 The boot chain consists of three stages:
@@ -108,3 +108,50 @@ During execution, the VBR uses these memory areas:
 
 - `0x7E00 - 0x7FFF`: temporary buffer used to load FAT sectors for FAT table calculations.
   Can be reused after the VBR no longer needs FAT access.
+
+## Stage 2
+Stage2 is the main bootloader stage.
+
+Its responsibilities are:
+
+1. Preserve information received from previous boot stages
+2. Validate the FAT32 filesystem structures
+3. Locate and load the kernel image into memory
+4. Retrieve the physical memory map using BIOS E820
+5. Build the `boot_info` structure
+6. Enable the A20 line
+7. Load the Global Descriptor Table (GDT)
+8. Switch the CPU from Real Mode to Protected Mode
+9. Transfer execution to the kernel entry point
+
+### Stage2 ABI
+
+Input from VBR:
+
+- `DL` = boot drive
+- `DS:SI` = pointer to active partition entry
+- `ES:DI` = pointer to the loaded VBR
+
+Output to Kernel:
+- see [Boot Protocol - CPU State](./boot_protocol#cpu-state.md) 
+
+### FAT32 Support
+Unlike VBR, Stage2 implements a more complete FAT32 reader.
+
+Current features include:
+
+- FAT chain traversal
+- directory traversal across multiple clusters
+- FAT entry validation
+- file loading across multiple clusters
+
+The kernel image is currently loaded from:
+```
+/BOOT/KERNEL.BIN
+```
+
+### Memory
+
+Stage2 is loaded at `0x0000:0x0700`.
+
+Unlike the VBR, Stage2 is not limited to a single 512-byte sector. It occupies a contiguous memory region large enough to contain both executable code and static data, including internal buffers used during the boot process.
