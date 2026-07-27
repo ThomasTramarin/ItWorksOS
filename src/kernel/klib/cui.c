@@ -1,6 +1,6 @@
 #include "cui.h"
 #include "conv.h"
-#include "va.h"
+#include <base/stdarg.h>
 
 static struct cui_state state;
 

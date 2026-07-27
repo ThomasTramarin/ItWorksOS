@@ -1,4 +1,3 @@
-
 /**
  * @file va.h
  *
@@ -23,10 +22,22 @@
  *   va_end(args);
  */
 
+#ifndef BASE_STDARG_H
+#define BASE_STDARG_H
+
 typedef char *va_list;
 
 #define va_start(ap, last) (ap = (va_list)((char *)&(last) + sizeof(last)))
 
-#define va_arg(ap, type) (*(type *)((ap += sizeof(type)) - sizeof(type)))
+#define VA_ALIGN(type) ((sizeof(type) + sizeof(int) - 1) & ~(sizeof(int) - 1))
+
+#define va_arg(ap, type)                                                       \
+  ({                                                                           \
+    type value = *(type *)ap;                                                  \
+    ap += VA_ALIGN(type);                                                      \
+    value;                                                                     \
+  })
 
 #define va_end(ap) ((void)(ap = (va_list)0))
+
+#endif
