@@ -1,5 +1,5 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef KLIB_TIME_H
+#define KLIB_TIME_H
 
 #include <base/stdint.h>
 

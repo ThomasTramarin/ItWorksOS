@@ -1,5 +1,5 @@
-#ifndef CONV_H
-#define CONV_H
+#ifndef KLIB_CONV_H
+#define KLIB_CONV_H
 
 #include <base/stdint.h>
 

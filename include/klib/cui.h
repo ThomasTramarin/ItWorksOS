@@ -1,5 +1,5 @@
-#ifndef CUI_H
-#define CUI_H
+#ifndef KLIB_CUI_H
+#define KLIB_CUI_H
 
 #include <drivers/video/vga/vga.h>
 
