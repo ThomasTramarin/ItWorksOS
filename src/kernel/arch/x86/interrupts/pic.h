@@ -1,6 +1,6 @@
 #ifndef PIC_H
 #define PIC_H
-#include <base/stdint.h>
+#include <base/stdbool.h>
 
 void pic_init(void);
 

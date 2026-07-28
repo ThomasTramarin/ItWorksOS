@@ -1,5 +1,7 @@
 #include "conv.h"
 
+#include <base/stdbool.h>
+
 void conv_itoa(int32_t value, char *str, uint8_t base) {
   char *ptr = str;
 

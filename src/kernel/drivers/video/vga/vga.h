@@ -1,6 +1,6 @@
 #ifndef VGA_H
 #define VGA_H
-#include <base/stdint.h>
+#include <base/stdbool.h>
 
 /**
  * @file vga.h

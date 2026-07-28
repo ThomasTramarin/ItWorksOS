@@ -11,14 +11,8 @@ typedef signed short int16_t;
 typedef signed int int32_t;
 typedef signed long long int64_t;
 
-typedef uint32_t uintptr_t; // Represents a memory pointer (32 bit)
-
-typedef uint32_t size_t;
-
-typedef uint8_t bool;
-#define true 1
-#define false 0
-
-#define NULL ((void *)0)
+// integer types capable of holding pointers (32-bit)
+typedef uint32_t uintptr_t;
+typedef int32_t intptr_t;
 
 #endif
