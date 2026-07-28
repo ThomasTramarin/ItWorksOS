@@ -1,4 +1,4 @@
-#include "memory.h"
+#include <klib/memory.h>
 
 void *memset(void *dst, int val, size_t n) {
   uint8_t *d = dst;
