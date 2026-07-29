@@ -3,8 +3,8 @@
 #include <arch/x86/interrupts/pic.h>
 #include <arch/x86/timer/pit.h>
 #include <boot/boot_info.h>
-#include <core/kmain.h>
 #include <drivers/video/vga/vga.h>
+#include <kernel/kmain.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
