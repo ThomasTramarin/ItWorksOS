@@ -56,4 +56,10 @@ bool ringbuf_push(ringbuf_t *rb, uint8_t data);
  */
 bool ringbuf_pop(ringbuf_t *rb, uint8_t *data);
 
+/**
+ * @brief Reads an element (byte) relative to the tail, without move it
+ *
+ */
+bool ringbuf_peek(ringbuf_t *rb, size_t index, uint8_t *data);
+
 #endif

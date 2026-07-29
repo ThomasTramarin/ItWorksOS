@@ -41,3 +41,16 @@ bool ringbuf_pop(ringbuf_t *rb, uint8_t *data) {
   rb->tail++;
   return true;
 }
+
+bool ringbuf_peek(ringbuf_t *rb, size_t index, uint8_t *data) {
+  if (index >= ringbuf_len(rb))
+    return false;
+
+  size_t calc_idx = (rb->tail + index) & (rb->cap - 1);
+
+  if (data) {
+    *data = rb->buf[calc_idx];
+  }
+
+  return true;
+}
