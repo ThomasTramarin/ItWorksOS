@@ -1,3 +1,4 @@
+#include "hal/io.h"
 #include <arch/x86/cpu/io.h>
 #include <arch/x86/interrupts/pic.h>
 #include <arch/x86/timer/pit.h>
@@ -20,7 +21,7 @@ void timer_init(void) {
   // The chip oscillates at the frequency of 1.1931816666 MHz
   int divisor = TIMER_PIT_FREQUENCY / TIMER_FREQUENCY;
 
-  outb(TIMER_PIT_CMD_BYTE, TIMER_PIT_CMD_PORT);
-  outb(TIMER_PIT_CH_0_PORT, (uint8_t)(divisor % 0xFF));        // lobyte
-  outb(TIMER_PIT_CH_0_PORT, (uint8_t)((divisor >> 8) & 0xFF)); // hibyte
+  hal_io_outb(TIMER_PIT_CMD_BYTE, TIMER_PIT_CMD_PORT);
+  hal_io_outb(TIMER_PIT_CH_0_PORT, (uint8_t)(divisor % 0xFF));        // lobyte
+  hal_io_outb(TIMER_PIT_CH_0_PORT, (uint8_t)((divisor >> 8) & 0xFF)); // hibyte
 }

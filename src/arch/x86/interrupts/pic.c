@@ -1,5 +1,5 @@
-#include <arch/x86/cpu/io.h>
 #include <arch/x86/interrupts/pic.h>
+#include <hal/io.h>
 
 typedef enum {
   PIC1_COMMAND_PORT = 0x20,
@@ -28,29 +28,33 @@ typedef enum {
   PIC_OCW3_RIS_ISR = 0x0B,
 } PIC_OCW3;
 
+static void io_wait(void) { hal_io_outb(0x80, 0); }
+
 void pic_init(void) {
   // ICW1
-  outb(PIC1_COMMAND_PORT, PIC_ICW1_IC4 | PIC_ICW1_INIT);
+  hal_io_outb(PIC1_COMMAND_PORT, PIC_ICW1_IC4 | PIC_ICW1_INIT);
   io_wait();
-  outb(PIC2_COMMAND_PORT, PIC_ICW1_IC4 | PIC_ICW1_INIT);
+  hal_io_outb(PIC2_COMMAND_PORT, PIC_ICW1_IC4 | PIC_ICW1_INIT);
   io_wait();
 
   // ICW2
-  outb(PIC1_DATA_PORT, 0x20); // The master PIC starts now from interrupt 32
+  hal_io_outb(PIC1_DATA_PORT,
+              0x20); // The master PIC starts now from interrupt 32
   io_wait();
-  outb(PIC2_DATA_PORT, 0x28); // The slave PIC starts now from interrupt 40
+  hal_io_outb(PIC2_DATA_PORT,
+              0x28); // The slave PIC starts now from interrupt 40
   io_wait();
 
   // ICW3
-  outb(PIC1_DATA_PORT, 0x04); // Master knows that it has a slave at IRQ2
+  hal_io_outb(PIC1_DATA_PORT, 0x04); // Master knows that it has a slave at IRQ2
   io_wait();
-  outb(PIC2_DATA_PORT, 0x02); // Set slave ID = 2
+  hal_io_outb(PIC2_DATA_PORT, 0x02); // Set slave ID = 2
   io_wait();
 
   // ICW4
-  outb(PIC1_DATA_PORT, PIC_ICW4_8086);
+  hal_io_outb(PIC1_DATA_PORT, PIC_ICW4_8086);
   io_wait();
-  outb(PIC2_DATA_PORT, PIC_ICW4_8086);
+  hal_io_outb(PIC2_DATA_PORT, PIC_ICW4_8086);
   io_wait();
 
   pic_set_all_irqs(false); // Disable all irqs
@@ -61,14 +65,14 @@ void pic_enable_irq(uint8_t irq) {
 
   if (irq < 8) {
     // Master
-    uint8_t mask = inb(PIC1_DATA_PORT);
+    uint8_t mask = hal_io_inb(PIC1_DATA_PORT);
     mask &= ~(1 << irq);
-    outb(PIC1_DATA_PORT, mask);
+    hal_io_outb(PIC1_DATA_PORT, mask);
   } else {
     // Slave
-    uint8_t mask = inb(PIC2_DATA_PORT);
+    uint8_t mask = hal_io_inb(PIC2_DATA_PORT);
     mask &= ~(1 << (irq - 8));
-    outb(PIC2_DATA_PORT, mask);
+    hal_io_outb(PIC2_DATA_PORT, mask);
   }
   io_wait();
 }
@@ -77,14 +81,14 @@ void pic_disable_irq(uint8_t irq) {
 
   if (irq < 8) {
     // Master
-    uint8_t mask = inb(PIC1_DATA_PORT);
+    uint8_t mask = hal_io_inb(PIC1_DATA_PORT);
     mask |= (1 << irq);
-    outb(PIC1_DATA_PORT, mask);
+    hal_io_outb(PIC1_DATA_PORT, mask);
   } else {
     // Slave
-    uint8_t mask = inb(PIC2_DATA_PORT);
+    uint8_t mask = hal_io_inb(PIC2_DATA_PORT);
     mask |= (1 << (irq - 8));
-    outb(PIC2_DATA_PORT, mask);
+    hal_io_outb(PIC2_DATA_PORT, mask);
   }
   io_wait();
 }
@@ -96,9 +100,9 @@ void pic_disable_irq(uint8_t irq) {
 void pic_set_all_irqs(bool enable) {
   uint8_t mask = enable ? 0x00 : 0xFF;
 
-  outb(PIC1_DATA_PORT, mask);
+  hal_io_outb(PIC1_DATA_PORT, mask);
   io_wait();
-  outb(PIC2_DATA_PORT, mask);
+  hal_io_outb(PIC2_DATA_PORT, mask);
   io_wait();
 }
 
@@ -110,22 +114,22 @@ void pic_send_eoi(uint8_t irq) {
   // the maser PIC
 
   if (irq >= 8) {
-    outb(PIC2_COMMAND_PORT, 0x20);
+    hal_io_outb(PIC2_COMMAND_PORT, 0x20);
     io_wait();
   }
 
-  outb(PIC1_COMMAND_PORT, 0x20);
+  hal_io_outb(PIC1_COMMAND_PORT, 0x20);
   io_wait();
 }
 
 uint8_t pic_read_reg_isr(bool slave) {
   if (slave) {
-    outb(PIC2_COMMAND_PORT, PIC_OCW3_RIS_ISR);
+    hal_io_outb(PIC2_COMMAND_PORT, PIC_OCW3_RIS_ISR);
     io_wait();
-    return inb(PIC2_COMMAND_PORT);
+    return hal_io_inb(PIC2_COMMAND_PORT);
   } else {
-    outb(PIC1_COMMAND_PORT, PIC_OCW3_RIS_ISR);
+    hal_io_outb(PIC1_COMMAND_PORT, PIC_OCW3_RIS_ISR);
     io_wait();
-    return inb(PIC1_COMMAND_PORT);
+    return hal_io_inb(PIC1_COMMAND_PORT);
   }
 }
