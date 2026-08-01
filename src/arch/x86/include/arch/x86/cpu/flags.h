@@ -1,15 +1,19 @@
-#ifndef ARCH_X86_CPU_EFLAGS_H
-#define ARCH_X86_CPU_EFLAGS_H
+#ifndef ARCH_X86_CPU_FLAGS_H
+#define ARCH_X86_CPU_FLAGS_H
 
 #include <base/bit.h>
+#include <base/stdbool.h>
 #include <base/stdint.h>
 
 /**
  * @file flags.h
  *
- * @brief Definitions for the x86 EFLAGS register.
+ * @brief x86 EFLAGS register operations and flag control instructions.
  */
 
+/*
+ * EFLAGS bit masks
+ */
 #define X86_FLAGS_CF_MASK BIT(0)  // Carry Flag
 #define X86_FLAGS_PF_MASK BIT(2)  // Parity Flag
 #define X86_FLAGS_AF_MASK BIT(4)  // Auxiliary Carry Flag
@@ -32,7 +36,35 @@
 #define X86_FLAGS_VIP_MASK BIT(20) // Virtual Interrupt Pending Flag
 #define X86_FLAGS_ID_MASK BIT(21)  // CPUID Identification Flag
 
+/*
+ * Read/write EFLAGS
+ */
 uint32_t x86_eflags_read(void);
 void x86_eflags_write(uint32_t eflags);
+
+/*
+ * Interrupt Flag (IF)
+ */
+void x86_cli(void);
+void x86_sti(void);
+
+bool x86_interrupts_enabled(void);
+
+/*
+ * Direction Flag (DF)
+ */
+void x86_cld(void);
+void x86_std(void);
+
+bool x86_direction_enabled(void);
+
+/*
+ * Trap Flag (TF)
+ */
+
+void x86_trap_enable(void);
+void x86_trap_disable(void);
+
+bool x86_trap_enabled(void);
 
 #endif
