@@ -1,5 +1,5 @@
-#ifndef ARCH_X86_EFLAGS_H
-#define ARCH_X86_EFLAGS_H
+#ifndef ARCH_X86_CPU_EFLAGS_H
+#define ARCH_X86_CPU_EFLAGS_H
 
 #include <base/bit.h>
 #include <base/stdint.h>
