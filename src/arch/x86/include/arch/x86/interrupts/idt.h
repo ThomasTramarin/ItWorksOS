@@ -34,16 +34,16 @@ struct x86_idt_gate {
    FIELD_SET(0, X86_IDT_FLAG_TYPE_MASK, X86_IDT_FLAG_TYPE_SHIFT, type))
 
 typedef enum {
-  IDT_GATE_TASK = 0x5,
-  IDT_GATE_INT_32 = 0xE, // CPU clears EFLAGS.IF before entering the handler
-  IDT_GATE_TRAP_32 = 0xF // CPU does not clear EFLAGS.IF
+  X86_IDT_GATE_TASK = 0x5,
+  X86_IDT_GATE_INT_32 = 0xE, // CPU clears EFLAGS.IF before entering the handler
+  X86_IDT_GATE_TRAP_32 = 0xF // CPU does not clear EFLAGS.IF
 } x86_idt_gate_type_t;
 
 typedef enum {
-  IDT_DPL_RING0 = 0,
-  IDT_DPL_RING1 = 1,
-  IDT_DPL_RING2 = 2,
-  IDT_DPL_RING3 = 3
+  X86_IDT_DPL_RING0 = 0,
+  X86_IDT_DPL_RING1 = 1,
+  X86_IDT_DPL_RING2 = 2,
+  X86_IDT_DPL_RING3 = 3
 } x86_idt_dpl_t;
 
 /**
