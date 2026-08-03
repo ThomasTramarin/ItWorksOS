@@ -1,26 +1,45 @@
 #include <arch/x86/interrupts/idt.h>
-#include <arch/x86/interrupts/isr.h>
+#include <base/bit.h>
+#include <klib/memory.h>
 
-static struct idt_entry idt[256];
-static struct idt_descriptor idt_ptr;
+struct x86_idt_raw_entry {
+  uint16_t offset_low;       // offset[0:15]
+  uint16_t segment_selector; // selector[0:15]
+  uint8_t reserved;          // set to 0
+  uint8_t flags;             // flags[0:7]
+  uint16_t offset_high;      // offset[16:31]
+} __attribute__((packed));
 
-void idt_set_gate(uint8_t num, uintptr_t offset, uint16_t segment_selector,
-                  uint8_t gate_type, uint8_t dpl, uint8_t present) {
+struct x86_idt_descriptor {
+  uint16_t size;   // bits 0-15
+  uint32_t offset; // bits 16-47
+} __attribute__((packed));
 
-  idt[num].offset_low = (uint16_t)(offset & 0xFFFF);
-  idt[num].segment_selector = segment_selector;
-  idt[num].reserved = 0;
+static struct x86_idt_raw_entry idt[X86_IDT_ENTRIES];
+static struct x86_idt_descriptor idt_desc;
 
-  idt[num].flags = (present << 7) | (dpl << 5) | (0 << 4) | (gate_type & 0x0F);
+void x86_idt_set_gate(uint8_t vector, struct x86_idt_gate *g) {
 
-  idt[num].offset_high = (uint16_t)((offset >> 16) & 0xFFFF);
+  idt[vector].offset_low = (uint16_t)(g->handler & 0xFFFF);
+  idt[vector].segment_selector = g->selector;
+  idt[vector].reserved = 0;
+
+  idt[vector].flags = g->flags;
+
+  idt[vector].offset_high = (uint16_t)((g->handler >> 16) & 0xFFFF);
 }
 
-void idt_init(void) {
-  idt_ptr.size = (sizeof(struct idt_entry) * 256) - 1;
-  idt_ptr.offset = (uintptr_t)&idt;
+static inline void x86_idt_desc_init(void) {
+  idt_desc.size = sizeof(idt) - 1;
+  idt_desc.offset = (uint32_t)idt;
+}
 
-  isr_init();
+void x86_idt_init(void) {
+  memset(idt, 0, sizeof(idt));
 
-  asm volatile("lidt (%0)" : : "r"(&idt_ptr));
+  x86_idt_desc_init();
+}
+
+void x86_idt_load(void) {
+  __asm__ volatile("lidtl (%0)" : : "r"(&idt_desc) : "memory");
 }
