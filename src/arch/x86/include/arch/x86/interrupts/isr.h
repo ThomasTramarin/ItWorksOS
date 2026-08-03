@@ -1,21 +1,23 @@
-#ifndef ISR_H
-#define ISR_H
+#ifndef ARCH_X86_INTERRUPTS_ISR_H
+#define ARCH_X86_INTERRUPTS_ISR_H
 
+#include <arch/x86/interrupts/frame.h>
 #include <base/stdint.h>
 
-struct __attribute__((packed)) registers {
-  uint32_t ds;
-  uint32_t edi, esi, ebp, kern_esp, ebx, edx, ecx, eax;
-  uint32_t int_no, err_code;
-  uint32_t eip, cs, eflags;
-};
+/**
+ * @brief Initialize the x86 ISR (Interrupt Service Routine) subsystem
+ *
+ * Sets all IDT gates as ring 0 interrupt gates.
+ * Vector 0x80 is exposed to ring 3 for the syscall interface.
+ */
+void x86_isr_init(void);
 
-typedef void (*isr_t)(struct registers *);
-
-void __attribute__((cdecl)) isr_init(void);
-
-void __attribute__((cdecl)) isr_handler(struct registers *regs);
-
-void isr_register_handler(uint8_t n, isr_t handler);
+/**
+ * @brief Common interrupt dispatcher called from the assembly ISR stub
+ *
+ * This function receives the interrupt frame and dispatches the interrupt
+ * to the handler registered for the corresponding vector
+ */
+void __attribute__((cdecl)) x86_isr_handler(struct x86_interrupt_frame *frame);
 
 #endif
