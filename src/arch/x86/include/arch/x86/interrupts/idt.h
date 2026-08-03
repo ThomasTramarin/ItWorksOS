@@ -1,5 +1,5 @@
-#ifndef ARCH_X86_IDT_H
-#define ARCH_X86_IDT_H
+#ifndef ARCH_X86_INTERRUPTS_IDT_H
+#define ARCH_X86_INTERRUPTS_IDT_H
 
 #include <base/bit.h>
 #include <base/stdint.h>
