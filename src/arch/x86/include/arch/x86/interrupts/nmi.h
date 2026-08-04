@@ -1,5 +1,5 @@
-#ifndef INTERRUPTS_NMI_H
-#define INTERRUPTS_NMI_H
+#ifndef ARCH_X86_INTERRUPTS_NMI_H
+#define ARCH_X86_INTERRUPTS_NMI_H
 
 #include <arch/x86/interrupts/frame.h>
 
