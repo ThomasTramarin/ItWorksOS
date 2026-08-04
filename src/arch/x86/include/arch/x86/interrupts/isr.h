@@ -7,8 +7,9 @@
 /**
  * @brief Initialize the x86 ISR (Interrupt Service Routine) subsystem
  *
- * Sets all IDT gates as ring 0 interrupt gates.
- * Vector 0x80 is exposed to ring 3 for the syscall interface.
+ * Sets all IDT gates as ring 0 interrupt gates except:
+ *  - 0x80: syscall gate (ring3, trap gate)
+ *  - #DB, #BP, #OF: (ring0, trap gate)
  */
 void x86_isr_init(void);
 
