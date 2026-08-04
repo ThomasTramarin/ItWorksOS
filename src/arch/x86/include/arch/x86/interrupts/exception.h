@@ -1,9 +1,9 @@
-#ifndef EXCEPTIONS_H
-#define EXCEPTIONS_H
+#ifndef ARCH_X86_INTERRUPTS_EXCEPTION_H
+#define ARCH_X86_INTERRUPTS_EXCEPTION_H
 
-#include <arch/x86/interrupts/isr.h>
+#include <arch/x86/interrupts/frame.h>
+#include <base/stdint.h>
 
-void exceptions_handler(struct registers *regs);
-void exceptions_init(void);
+void x86_exception_handler(struct x86_interrupt_frame *frame);
 
 #endif
