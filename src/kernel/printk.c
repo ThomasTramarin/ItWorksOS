@@ -1,3 +1,4 @@
+#include "klib/cui.h"
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <klib/printf.h>
@@ -19,6 +20,7 @@ int vprintk(const char *fmt, va_list args) {
   int total_len = vsnprintf(buffer, sizeof(buffer), fmt, args);
 
   syslog_write(buffer);
+  cui_puts(buffer); // print also to the screen
 
   return total_len;
 }
