@@ -1,9 +1,9 @@
-#include <arch/x86/interrupts/exceptions.h>
-#include <arch/x86/interrupts/idt.h>
-#include <arch/x86/interrupts/pic.h>
-#include <arch/x86/timer/pit.h>
+#include <arch/x86/pit.h>
 #include <boot/boot_info.h>
 #include <drivers/video/vga/vga.h>
+#include <hal/cpu.h>
+#include <hal/interrupt.h>
+#include <kernel/arch.h>
 #include <kernel/kmain.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
@@ -30,25 +30,14 @@ void kmain(uint32_t magic, boot_info_t *info) {
             len_low, entry.type, entry.attr);
   }
 
-  idt_init();
-  pr_info("IDT and ISR configurated.\n");
+  arch_init();
 
-  exceptions_init();
-  pr_info("Exception handler enabled.\n");
-
-  pic_init();
-  pr_info("PIC configurated.\n");
-
-  timer_init();
-  pr_info("PIT configurated.\n");
-
-  asm volatile("sti");
-  pr_info("Interrupts enabled.\n");
+  hal_interrupt_enable();
 
   cui_puts("Welcome to ItWorksOnMyHP");
 
   // CPU halt
   while (1) {
-    asm volatile("hlt");
+    hal_cpu_halt();
   }
 }
