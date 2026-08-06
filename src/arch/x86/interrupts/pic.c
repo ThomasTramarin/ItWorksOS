@@ -1,7 +1,6 @@
-#include "base/bit.h"
 #include <arch/x86/interrupts/pic.h>
 #include <arch/x86/io.h>
-#include <stdint.h>
+#include <base/bit.h>
 
 /**
  * @brief I/O ports
