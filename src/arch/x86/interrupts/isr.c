@@ -1,6 +1,7 @@
 #include <arch/x86/cpu/gdt.h>
 #include <arch/x86/interrupts/exception.h>
 #include <arch/x86/interrupts/idt.h>
+#include <arch/x86/interrupts/irq.h>
 #include <arch/x86/interrupts/isr.h>
 #include <arch/x86/interrupts/nmi.h>
 #include <arch/x86/interrupts/pic.h>
@@ -66,4 +67,6 @@ void __attribute__((cdecl)) x86_isr_handler(struct x86_interrupt_frame *frame) {
     x86_exception_handler(frame);
     return;
   }
+
+  x86_irq_handler(frame);
 }
