@@ -1,7 +1,5 @@
-#ifndef PIT_H
-#define PIT_H
-
-#include <arch/x86/interrupts/isr.h>
+#ifndef ARCH_X86_PIT_H
+#define ARCH_X86_PIT_H
 
 enum {
   TIMER_PIT_CH_0_PORT = 0x40,
@@ -24,6 +22,6 @@ enum {
 #define TIMER_PIT_FREQUENCY 1193182
 #define TIMER_FREQUENCY 1000
 
-void timer_init(void);
+// void x86_timer_init(void);
 
 #endif
