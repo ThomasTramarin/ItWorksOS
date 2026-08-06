@@ -4,10 +4,11 @@ CC  = i686-elf-gcc
 LD  = i686-elf-ld
 
 # Project Directories
-SRC_DIR        = ./src
-BUILD_DIR      = ./build
-BIN_DIR        = ./bin
-INCLUDE_DIR    = ./include
+SRC_DIR          = ./src
+BUILD_DIR        = ./build
+BIN_DIR          = ./bin
+INCLUDE_DIR      = ./include
+ARCH_INCLUDE_DIR = $(SRC_DIR)/arch/x86/include
 
 TOOLS_DIR      = ./tools
 MKIMAGE_DIR = $(TOOLS_DIR)/mkimage
@@ -38,7 +39,9 @@ CFLAGS = \
 		-Wall \
 		-O0 \
 		-std=gnu99 \
-		-I$(INCLUDE_DIR)
+		-I$(INCLUDE_DIR) \
+		-I$(ARCH_INCLUDE_DIR) \
+		-DARCH_X86
 
 # Automatically discover kernel sources (to build the singce kernel.bin)
 # Everything under src/ except bootloader sources belongs to the kernel source tree.
