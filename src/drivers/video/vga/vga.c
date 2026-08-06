@@ -1,6 +1,6 @@
-#include <arch/x86/cpu/io.h>
 #include <base/stddef.h>
 #include <drivers/video/vga/vga.h>
+#include <hal/port.h>
 
 static volatile struct vga_cell *text_buffer = (struct vga_cell *)VGA_MEM_ADDR;
 static struct vga_cell back_buffer[VGA_ROWS * VGA_COLS];
@@ -153,23 +153,23 @@ void vga_scroll(struct vga_cell_attr blank_attr) {
 
 void vga_cursor_enable(void) {
   // disable Cursor Disable flag (CD = 0)
-  outb(VGA_INDEX_PORT, VGA_CURSOR_START_REG);
-  uint8_t start = inb(VGA_DATA_PORT);
+  hal_port_write8(VGA_INDEX_PORT, VGA_CURSOR_START_REG);
+  uint8_t start = hal_port_read8(VGA_DATA_PORT);
   start &= ~0x20;
 
-  outb(VGA_INDEX_PORT, VGA_CURSOR_START_REG);
-  outb(VGA_DATA_PORT, start);
+  hal_port_write8(VGA_INDEX_PORT, VGA_CURSOR_START_REG);
+  hal_port_write8(VGA_DATA_PORT, start);
 }
 
 void vga_cursor_disable(void) {
   // set the CD (Cursor Disable) bit to 1 (bit n 5)
-  outb(VGA_INDEX_PORT, VGA_CURSOR_START_REG);
+  hal_port_write8(VGA_INDEX_PORT, VGA_CURSOR_START_REG);
 
-  uint8_t start = inb(VGA_DATA_PORT);
+  uint8_t start = hal_port_read8(VGA_DATA_PORT);
   start |= 0x20;
 
-  outb(VGA_INDEX_PORT, VGA_CURSOR_START_REG);
-  outb(VGA_DATA_PORT, start);
+  hal_port_write8(VGA_INDEX_PORT, VGA_CURSOR_START_REG);
+  hal_port_write8(VGA_DATA_PORT, start);
 }
 
 void vga_cursor_set_xy(uint8_t x, uint8_t y) {
@@ -179,20 +179,20 @@ void vga_cursor_set_xy(uint8_t x, uint8_t y) {
   //
   uint16_t pos = vga_xy_to_pos(x, y);
 
-  outb(VGA_INDEX_PORT, VGA_CURSOR_LOBYTE_POS_REG);
-  outb(VGA_DATA_PORT, (pos & 0xFF));
+  hal_port_write8(VGA_INDEX_PORT, VGA_CURSOR_LOBYTE_POS_REG);
+  hal_port_write8(VGA_DATA_PORT, (pos & 0xFF));
 
-  outb(VGA_INDEX_PORT, VGA_CURSOR_HIBYTE_POS_REG);
-  outb(VGA_DATA_PORT, (pos >> 8) & 0xFF);
+  hal_port_write8(VGA_INDEX_PORT, VGA_CURSOR_HIBYTE_POS_REG);
+  hal_port_write8(VGA_DATA_PORT, (pos >> 8) & 0xFF);
 }
 
 void vga_cursor_get_xy(uint8_t *x, uint8_t *y) {
   uint16_t pos = 0;
-  outb(VGA_INDEX_PORT, VGA_CURSOR_LOBYTE_POS_REG);
-  pos = inb(VGA_DATA_PORT);
+  hal_port_write8(VGA_INDEX_PORT, VGA_CURSOR_LOBYTE_POS_REG);
+  pos = hal_port_read8(VGA_DATA_PORT);
 
-  outb(VGA_INDEX_PORT, VGA_CURSOR_HIBYTE_POS_REG);
-  pos = pos | (inb(VGA_DATA_PORT) << 8);
+  hal_port_write8(VGA_INDEX_PORT, VGA_CURSOR_HIBYTE_POS_REG);
+  pos = pos | (hal_port_read8(VGA_DATA_PORT) << 8);
 
   vga_pos_to_xy(pos, x, y);
 }
@@ -204,9 +204,9 @@ void vga_cursor_set_shape(uint8_t start_scanline, uint8_t end_scanline) {
   if (start_scanline > 15 || end_scanline > 15)
     return;
 
-  outb(VGA_INDEX_PORT, VGA_CURSOR_START_REG);
-  outb(VGA_DATA_PORT, start_scanline);
+  hal_port_write8(VGA_INDEX_PORT, VGA_CURSOR_START_REG);
+  hal_port_write8(VGA_DATA_PORT, start_scanline);
 
-  outb(VGA_INDEX_PORT, VGA_CURSOR_END_REG);
-  outb(VGA_DATA_PORT, end_scanline);
+  hal_port_write8(VGA_INDEX_PORT, VGA_CURSOR_END_REG);
+  hal_port_write8(VGA_DATA_PORT, end_scanline);
 }
