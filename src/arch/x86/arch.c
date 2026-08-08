@@ -1,3 +1,4 @@
+#include <arch/x86/cpu/cpuid.h>
 #include <arch/x86/cpu/flags.h>
 #include <arch/x86/cpu/gdt.h>
 #include <arch/x86/interrupts/idt.h>
@@ -8,6 +9,8 @@
 void arch_init(void) {
   x86_cli(); // disable interrupts
   x86_cld(); // clear direction flag
+
+  x86_cpu_detect();
 
   x86_gdt_init();
   x86_idt_init();
