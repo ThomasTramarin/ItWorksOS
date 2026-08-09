@@ -3,9 +3,34 @@
 
 #include <base/stdbool.h>
 
+// CPUID.01H - CPU info and feature bits
+struct x86_cpuid_leaf_1 {
+  bool valid;
+
+  uint8_t stepping;
+  uint8_t model;
+  uint8_t family;
+  uint8_t type;
+  uint8_t extended_model;
+  uint8_t extended_family;
+
+  uint8_t clflush_size;
+  uint8_t logical_processors;
+  uint8_t initial_apic_id;
+
+  uint32_t features_ecx;
+  uint32_t features_edx;
+};
+
 struct x86_cpu_info {
+  // CPU identification
   char vendor[13]; // 12 + null term
+
+  // CPUID availability
   uint32_t max_basic_leaf;
+  uint32_t max_extended_leaf;
+
+  struct x86_cpuid_leaf_1 leaf1;
 };
 
 extern struct x86_cpu_info x86_cpu_info;

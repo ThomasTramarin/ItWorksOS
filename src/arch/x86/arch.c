@@ -5,12 +5,15 @@
 #include <arch/x86/interrupts/isr.h>
 #include <arch/x86/interrupts/pic.h>
 #include <kernel/arch.h>
+#include <kernel/panic.h>
 
 void arch_init(void) {
   x86_cli(); // disable interrupts
   x86_cld(); // clear direction flag
 
-  x86_cpu_detect();
+  if (!x86_cpu_detect()) {
+    panic("CPUID is not supported");
+  }
 
   x86_gdt_init();
   x86_idt_init();
