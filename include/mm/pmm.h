@@ -4,7 +4,7 @@
 #include <boot/boot_info.h>
 
 void pmm_init(struct boot_mem_map_entry *map_ptr, uint16_t count);
-void pmm_alloc(void);
-void pmm_free(void);
+uintptr_t pmm_alloc_frame(void);
+void pmm_free_frame(uintptr_t addr);
 
 #endif
