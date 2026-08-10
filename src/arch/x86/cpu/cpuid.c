@@ -147,9 +147,6 @@ bool x86_cpu_detect(void) {
   if (x86_cpu_info.max_basic_leaf >= 1) {
     x86_cpuid(1, 0, &regs);
 
-    pr_debug(CPUINFO_LOG "CPUID.01H: EAX=%x EBX=%x ECX=%x EDX=%x\n", regs.eax,
-             regs.ebx, regs.ecx, regs.edx);
-
     x86_cpuid_leaf_1_decode(&regs);
 
     pr_debug(CPUINFO_LOG "Family (0x%x), Model (0x%x), Stepping (0x%x)\n",
@@ -162,6 +159,9 @@ bool x86_cpu_detect(void) {
 
     pr_debug(CPUINFO_LOG "CLFLUSH line size (%uB)\n",
              x86_cpu_info.leaf1.clflush_size);
+
+    pr_debug(CPUINFO_LOG "CPUID.01H.ECX (0x%x), CPUID.01H.EDX (0x%x)\n",
+             x86_cpu_info.leaf1.features_ecx, x86_cpu_info.leaf1.features_edx);
   }
 
   return true;
