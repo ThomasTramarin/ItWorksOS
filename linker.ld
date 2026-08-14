@@ -1,28 +1,33 @@
 ENTRY(_start)
 OUTPUT_FORMAT(binary)
 SECTIONS {
-    . = 0x10000; 
+    . = 0xC0010000;
 
-    .text : ALIGN(4096)
+    kernel_start = .;
+
+    .text : AT(ADDR(.text) - 0xC0000000)
     {
-
         *kernel.asm.o(.text)
-        *(.text)
+        *(.text*)
     }
 
-    .rodata : ALIGN(4096)
+    .rodata : AT(ADDR(.rodata) - 0xC0000000)
     {
-        *(.rodata)
+        *(.rodata*)
     }
 
-    .data : ALIGN(4096) 
+    .data : AT(ADDR(.data) - 0xC0000000)
     {
-        *(.data)
+        *(.data*)
     }
 
-    .bss : ALIGN(4096) 
+    .bss ALIGN(4096) : AT(ADDR(.bss) - 0xC0000000)
     {
+        bss_start = .;
         *(COMMON)
-        *(.bss)
+        *(.bss*)
+        bss_end = .;
     }
+
+    kernel_end = .;
 }
