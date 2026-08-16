@@ -1,4 +1,3 @@
-#include <arch/x86/pit.h>
 #include <boot/boot_info.h>
 #include <drivers/video/vga/vga.h>
 #include <hal/cpu.h>
@@ -9,8 +8,13 @@
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <klib/cui.h>
+#include <mm/pmm.h>
 
-void kmain(uint32_t magic, boot_info_t *info) {
+void kmain(uint32_t magic, paddr_t boot_info_phys) {
+
+  // virtual address
+  struct boot_info *info = (struct boot_info *)(boot_info_phys + 0xC0000000);
+
   syslog_init();
 
   cui_init(VGA_COLOR_WHITE, VGA_COLOR_BLUE, 0);
@@ -19,15 +23,12 @@ void kmain(uint32_t magic, boot_info_t *info) {
     panic("Invalid boot magic value");
   }
 
-  pr_info("Memory Map:\n");
-  for (uint32_t i = 0; i < info->memory_map_count; i++) {
-    boot_mem_map_entry_t entry = info->memory_map_ptr[i];
+  // virtual address
+  const struct boot_mem_map_entry *map =
+      (const struct boot_mem_map_entry *)(info->memory_map_phys + 0xC0000000);
 
-    uint32_t base_low = (uint32_t)entry.base;
-    uint32_t len_low = (uint32_t)entry.length;
-
-    pr_info("%d. Base: 0x%x, Length: 0x%x, Type: %x, Attr: %x\n", i, base_low,
-            len_low, entry.type, entry.attr);
+  if (pmm_init(map, info->memory_map_count) < 0) {
+    panic("Failed to initialize PMM");
   }
 
   arch_init();

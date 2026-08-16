@@ -3,6 +3,6 @@
 
 #include <boot/boot_info.h>
 
-void kmain(uint32_t magic, boot_info_t *info);
+void kmain(uint32_t magic, paddr_t boot_info);
 
 #endif
