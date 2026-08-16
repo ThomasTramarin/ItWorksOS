@@ -26,7 +26,7 @@
  */
 #define BOOT_ATTR_NON_VOLATILE (1 << 1)
 
-typedef enum {
+enum boot_mem_type {
   /* Standard usable RAM. The PMM can use it */
   BOOT_TYPE_USABLE = 1,
   /* Reserved memory used by the BIOS, hardware MMIO, or system devices */
@@ -37,21 +37,22 @@ typedef enum {
   BOOT_TYPE_ACPI_NVS = 4,
   /* Bad memory. Must never be accessed */
   BOOT_TYPE_BAD = 5
-} boot_mem_type_t;
+};
 
-typedef struct __attribute__((packed)) {
+struct boot_mem_map_entry {
   uint64_t base;
   uint64_t length;
   uint32_t type; // boot_mem_type_t
   uint32_t attr; // ACPI attributes (BOOT_ATTR_*)
-} boot_mem_map_entry_t;
+} __attribute__((packed));
 
 /**
  * The bootloader builds this struct and passes it to the kmain function
  */
-typedef struct __attribute__((packed)) {
-  uint16_t memory_map_count;            // number of entries
-  boot_mem_map_entry_t *memory_map_ptr; // pointer to the array of entries
-} boot_info_t;
+struct boot_info {
+  uint16_t memory_map_count; // number of entries
+  paddr_t memory_map_phys;   // pointer to the array of entries (stored inside
+                             // stage2 bootloader memory)
+} __attribute__((packed));
 
 #endif
