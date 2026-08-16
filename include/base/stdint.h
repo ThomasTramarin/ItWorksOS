@@ -16,7 +16,7 @@ typedef uint32_t uintptr_t;
 typedef int32_t intptr_t;
 
 // Physical and virtual address types
-typedef uintptr_t paddr_t;
+typedef uint64_t paddr_t;
 typedef uintptr_t vaddr_t;
 
 #endif
