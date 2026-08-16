@@ -4,11 +4,6 @@
 #include <base/stdint.h>
 #include <boot/boot_info.h>
 
-enum pmm_alloc_flags {
-  /* Clear all allocated frames to zero */
-  PMM_ALLOC_ZERO = 1 << 0,
-};
-
 /**
  * @brief Initialize the Physical Memory Manager
  *
@@ -25,12 +20,10 @@ int32_t pmm_init(const struct boot_mem_map_entry *map_ptr, uint16_t count);
  * @param max Exclusive upper bound physical address. Pass 0 for no upper
  *            boundary (defaults to maximum detected physical RAM).
  * @param pages Number of frames to allocate (if > 1, frames will be contiguous)
- * @param flags Flags from enum pmm_alloc_flags
- * @param out Pysical address of the allocation
+ * @param out Physical address of the allocation
  * @return KERR_OK on success, or a negative kernel error code
  */
-int32_t pmm_alloc(paddr_t min, paddr_t max, size_t pages, uint32_t flags,
-                  paddr_t *out);
+int32_t pmm_alloc(paddr_t min, paddr_t max, size_t pages, paddr_t *out);
 
 /**
  * @brief Free previously allocated physical frames

@@ -5,9 +5,7 @@
 #include <kernel/error.h>
 #include <kernel/printk.h>
 #include <klib/bitmap.h>
-#include <klib/memory.h>
 #include <mm/pmm.h>
-#include <stdint.h>
 
 /**
  * The PMM uses a bitmap for tracking whether a frame (4 KiB) is free
@@ -25,17 +23,24 @@ extern uint8_t kernel_end[];
 #define PMM_FRAME_SIZE 4096
 #define PMM_LOG "PMM: "
 
+#define KERNEL_VIRT_BASE 0xC0000000
+
 static struct {
   struct bitmap bm;
+
+  /* End of Physical address range in memory map */
   paddr_t max_addr;
 
+  /* Number of frames represented by the bitmap */
   uint32_t total_frames;
+
+  /* Number of currently allocatable frame */
   uint32_t free_frames;
 } pmm;
 
 /* Convert a physical address to a frame number */
 static inline uint32_t pmm_addr_to_frame(paddr_t addr) {
-  return addr / PMM_FRAME_SIZE;
+  return (uint32_t)(addr / PMM_FRAME_SIZE);
 }
 
 /* Convert a frame number to a physical address */
@@ -127,8 +132,9 @@ static int32_t pmm_unreserve(paddr_t addr, size_t pages) {
 }
 
 /*
- * Force-marks a frame range as reserved during init regardless of its
- * previous state (without returning KERR_BUSY on overlapping regions).
+ * Force-marks a range as reserved during initialization.
+ * Unlike pmm_reserve(), this function does not care about the previous
+ * state of the frames.
  */
 static void pmm_force_reserve_range(uint32_t start_frame, size_t pages) {
   for (size_t i = 0; i < pages; i++) {
@@ -143,18 +149,34 @@ int32_t pmm_init(const struct boot_mem_map_entry *map_ptr, uint16_t count) {
   if (!map_ptr || count == 0)
     return -KERR_INVAL;
 
-  memset(&pmm, 0, sizeof(pmm));
+  pr_debug(PMM_LOG "Physical Memory Map:\n");
 
-  // find the highest usable physical address
   for (uint16_t i = 0; i < count; i++) {
+    pr_debug(PMM_LOG "[%d] base=%x len=%x type=%x attr=%x\n", i,
+             (uint32_t)map_ptr[i].base, (uint32_t)map_ptr[i].length,
+             map_ptr[i].type, map_ptr[i].attr);
+  }
+
+  pmm.max_addr = 0;
+
+  for (uint16_t i = 0; i < count; i++) {
+
+    if (map_ptr[i].type != BOOT_TYPE_USABLE)
+      continue;
+
     uint64_t entry_end = map_ptr[i].base + map_ptr[i].length;
+
     if (entry_end > pmm.max_addr)
       pmm.max_addr = (paddr_t)entry_end;
   }
 
-  pmm.total_frames = pmm.max_addr / PMM_FRAME_SIZE;
+  /*
+   * One bitmap bit represents one 4 KiB physical frame.
+   */
+  pmm.total_frames =
+      (uint32_t)(ALIGN_UP(pmm.max_addr, PMM_FRAME_SIZE) / PMM_FRAME_SIZE);
 
-  // Initialize the bitmap immediately after kernel_end
+  // Initialize the bitmap immediately after the kernel image
   bitmap_init(&pmm.bm, (uint32_t *)kernel_end, pmm.total_frames);
 
   // mark all frames as reserved by default
@@ -162,61 +184,90 @@ int32_t pmm_init(const struct boot_mem_map_entry *map_ptr, uint16_t count) {
     bitmap_set(&pmm.bm, i);
   }
 
-  // free usable memory (type 1)
+  // Free usable memory (type 1)
   for (uint16_t i = 0; i < count; i++) {
-    if (map_ptr[i].type == BOOT_TYPE_USABLE) {
+    if (map_ptr[i].type != BOOT_TYPE_USABLE)
+      continue;
 
-      uint64_t start_frame =
-          ALIGN_UP(map_ptr[i].base, PMM_FRAME_SIZE) / PMM_FRAME_SIZE;
-      uint64_t end_frame =
-          ALIGN_DOWN(map_ptr[i].base + map_ptr[i].length, PMM_FRAME_SIZE) /
-          PMM_FRAME_SIZE;
+    uint64_t start = ALIGN_UP(map_ptr[i].base, PMM_FRAME_SIZE);
 
-      for (uint64_t j = start_frame; j < end_frame; j++) {
-        bitmap_clear(&pmm.bm, j);
-      }
+    uint64_t end =
+        ALIGN_DOWN(map_ptr[i].base + map_ptr[i].length, PMM_FRAME_SIZE);
+
+    uint32_t start_frame = (uint32_t)(start / PMM_FRAME_SIZE);
+
+    uint32_t end_frame = (uint32_t)(end / PMM_FRAME_SIZE);
+
+    for (uint32_t frame = start_frame; frame < end_frame; frame++) {
+
+      bitmap_clear(&pmm.bm, frame);
     }
   }
 
-  /*
-   * Protect critical areas
-   * - The first MiB
-   * - Kernel segments
-   * - PMM bitmap itself
-   */
+  // Reserve the first MiB
   uint32_t first_mib_frames = (1024 * 1024) / PMM_FRAME_SIZE;
   pmm_force_reserve_range(0, first_mib_frames);
 
-  paddr_t kstart_phys = (paddr_t)kernel_start;
-  size_t bitmap_size_bytes = (pmm.total_frames + 7) / 8;
-  paddr_t bitmap_end_phys = (paddr_t)kernel_end + bitmap_size_bytes;
+  paddr_t kernel_start_phys = (paddr_t)(kernel_start - KERNEL_VIRT_BASE);
 
-  uint32_t kstart_frame = pmm_addr_to_frame(kstart_phys);
+  paddr_t kernel_end_phys = (paddr_t)(kernel_end - KERNEL_VIRT_BASE);
+
+  // Reserve the kernel image
+  uint32_t kernel_start_frame =
+      pmm_addr_to_frame(ALIGN_DOWN(kernel_start_phys, PMM_FRAME_SIZE));
+
+  uint32_t kernel_end_frame =
+      pmm_addr_to_frame(ALIGN_UP(kernel_end_phys, PMM_FRAME_SIZE));
+
+  pmm_force_reserve_range(kernel_start_frame,
+                          kernel_end_frame - kernel_start_frame);
+
+  // Reserve the PMM bitmap
+  size_t bitmap_size_bytes = (pmm.total_frames + 7) / 8;
+
+  paddr_t bitmap_start_phys = kernel_end_phys;
+
+  paddr_t bitmap_end_phys = bitmap_start_phys + bitmap_size_bytes;
+
+  uint32_t bitmap_start_frame =
+      pmm_addr_to_frame(ALIGN_DOWN(bitmap_start_phys, PMM_FRAME_SIZE));
+
   uint32_t bitmap_end_frame =
       pmm_addr_to_frame(ALIGN_UP(bitmap_end_phys, PMM_FRAME_SIZE));
 
-  size_t kernel_and_bitmap_pages = bitmap_end_frame - kstart_frame;
+  pmm_force_reserve_range(bitmap_start_frame,
+                          bitmap_end_frame - bitmap_start_frame);
 
-  pmm_force_reserve_range(kstart_frame, kernel_and_bitmap_pages);
+  // Calculate final number of available free frames
+  pmm.free_frames = 0;
 
-  // Calculate free frames
   for (uint32_t i = 0; i < pmm.total_frames; i++) {
-    if (bitmap_test(&pmm.bm, i) == 0)
+    if (!bitmap_test(&pmm.bm, i))
       pmm.free_frames++;
   }
+
+  // Debug info
+  uint32_t physical_address_space_mib =
+      (uint32_t)(pmm.max_addr / (1024 * 1024));
+
+  uint32_t allocatable_mib =
+      (uint32_t)((pmm.free_frames * PMM_FRAME_SIZE) / (1024 * 1024));
 
   pr_debug(PMM_LOG "Kernel start (%p), Kernel end (%p)\n", kernel_start,
            kernel_end);
 
-  pr_debug(PMM_LOG "RAM detected (%dMiB)\n", (pmm.max_addr / 1024 / 1024));
-  pr_debug(PMM_LOG "Total frames (%d), Free frames: (%d)\n", pmm.total_frames,
+  pr_debug(PMM_LOG "Physical Address Space: %u MiB\n",
+           physical_address_space_mib);
+
+  pr_debug(PMM_LOG "Allocatable RAM: %u MiB\n", allocatable_mib);
+
+  pr_debug(PMM_LOG "Total frames: %u, Free frames: %u\n", pmm.total_frames,
            pmm.free_frames);
 
   return KERR_OK;
 }
 
-int32_t pmm_alloc(paddr_t min, paddr_t max, size_t pages, uint32_t flags,
-                  paddr_t *out) {
+int32_t pmm_alloc(paddr_t min, paddr_t max, size_t pages, paddr_t *out) {
 
   if (!out || pages == 0)
     return -KERR_INVAL;
@@ -254,10 +305,6 @@ int32_t pmm_alloc(paddr_t min, paddr_t max, size_t pages, uint32_t flags,
       pmm.free_frames -= pages;
 
       paddr_t alloc_addr = pmm_frame_to_addr(first_found_frame);
-
-      if (flags & PMM_ALLOC_ZERO) {
-        memset((void *)alloc_addr, 0, pages * PMM_FRAME_SIZE);
-      }
 
       *out = alloc_addr;
 
