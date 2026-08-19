@@ -21,10 +21,27 @@ void x86_cr0_write(uint32_t value);
 uint32_t x86_cr0_read(void);
 
 /*
- * The CR3 register contains the physical address of the
- * Page Directory currently used by the CPU.
+ * CR2
+ * Contains the linear address that caused the most recent page-fault exception
  */
+uint32_t x86_cr2_read(void);
+
+/*
+ * The CR3 register contains the physical address of the
+ * Page Directory currently used by the CPU and two flags
+ */
+#define X86_CR3_PWT BIT(3) /* Page-level Write-Through */
+#define X86_CR3_PCD BIT(4) /* Page-level Cache Disable */
 void x86_cr3_write(uint32_t value);
 uint32_t x86_cr3_read(void);
+
+/*
+ * CR4
+ */
+#define X86_CR4_PSE BIT(4) /* Page Size Extensions (4 MiB pages) */
+#define X86_CR4_PAE BIT(5) /* Physical Address Extension */
+
+void x86_cr4_write(uint32_t value);
+uint32_t x86_cr4_read(void);
 
 #endif
