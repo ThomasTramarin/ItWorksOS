@@ -267,7 +267,8 @@ int32_t pmm_init(const struct boot_mem_map_entry *map_ptr, uint16_t count) {
   return KERR_OK;
 }
 
-int32_t pmm_alloc(paddr_t min, paddr_t max, size_t pages, paddr_t *out) {
+int32_t pmm_alloc(paddr_t min, paddr_t max, size_t pages,
+                  enum pmm_policy policy, paddr_t *out) {
 
   if (!out || pages == 0)
     return -KERR_INVAL;
@@ -279,37 +280,33 @@ int32_t pmm_alloc(paddr_t min, paddr_t max, size_t pages, paddr_t *out) {
   if (max_frame > pmm.total_frames)
     max_frame = pmm.total_frames;
 
-  if (start_frame >= max_frame)
-    return -KERR_INVAL;
-
-  uint32_t consecutive = 0;
-
-  // Search for 'pages' contiguous free frames
-  for (uint32_t i = start_frame; i < max_frame; i++) {
-    if (bitmap_test(&pmm.bm, i)) {
-      consecutive = 0;
-      continue;
-    }
-
-    consecutive++;
-
-    // contiguous free frames found
-    if (consecutive == pages) {
-      uint32_t first_found_frame = i - pages + 1;
-
-      // mark frames as allocated in the bitmap
-      for (size_t j = 0; j < pages; j++) {
-        bitmap_set(&pmm.bm, first_found_frame + j);
+  if (start_frame < max_frame) {
+    uint32_t consecutive = 0;
+    for (uint32_t i = start_frame; i < max_frame; i++) {
+      if (bitmap_test(&pmm.bm, i)) {
+        consecutive = 0;
+        continue;
       }
 
-      pmm.free_frames -= pages;
+      if (++consecutive == pages) {
+        uint32_t first_found_frame = i - pages + 1;
 
-      paddr_t alloc_addr = pmm_frame_to_addr(first_found_frame);
+        // mark frames as allocated in the bitmap
+        for (size_t j = 0; j < pages; j++) {
+          bitmap_set(&pmm.bm, first_found_frame + j);
+        }
 
-      *out = alloc_addr;
+        pmm.free_frames -= pages;
 
-      return KERR_OK;
+        *out = pmm_frame_to_addr(first_found_frame);
+        return KERR_OK;
+      }
     }
+  }
+
+  /* Fallback try */
+  if (policy == PMM_POLICY_FALLBACK) {
+    return pmm_alloc(0, 0, pages, PMM_POLICY_STRICT, out);
   }
 
   // failed to allocate memory
