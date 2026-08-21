@@ -1,25 +1,22 @@
 #ifndef MM_PMM_H
 #define MM_PMM_H
-#include <base/bit.h>
 #include <base/stddef.h>
 #include <base/stdint.h>
 #include <boot/boot_info.h>
+#include <mm/layout.h>
 
-enum pmm_policy { PMM_POLICY_STRICT = 0, PMM_POLICY_FALLBACK = BIT(0) };
-
-#define PMM_DMA16_LIMIT (16ULL * 1024 * 1024)   /* 16 MiB */
-#define PMM_LOWMEM_LIMIT (768ULL * 1024 * 1024) /* 768 MiB */
+enum pmm_policy { PMM_POLICY_STRICT = 0, PMM_POLICY_FALLBACK = 1 };
 
 /* DMA16 and LOWMEM require a STRICT policy*/
 #define PMM_ALLOC_DMA16(pages, out)                                            \
-  pmm_alloc(0, PMM_DMA16_LIMIT, (pages), PMM_POLICY_STRICT, (out))
+  pmm_alloc(0, DMA16_LIMIT, (pages), PMM_POLICY_STRICT, (out))
 
 #define PMM_ALLOC_LOWMEM(pages, out)                                           \
-  pmm_alloc(0, PMM_LOWMEM_LIMIT, (pages), PMM_POLICY_STRICT, (out))
+  pmm_alloc(0, KERNEL_LOWMEM_LIMIT, (pages), PMM_POLICY_STRICT, (out))
 
 /* HIGHMEM uses a FALLBACK policy (it prefers above 768 MiB) */
 #define PMM_ALLOC_HIGHMEM(pages, out)                                          \
-  pmm_alloc(PMM_LOWMEM_LIMIT, 0, (pages), PMM_POLICY_FALLBACK, (out))
+  pmm_alloc(KERNEL_LOWMEM_LIMIT, 0, (pages), PMM_POLICY_FALLBACK, (out))
 
 #define PMM_ALLOC_ANY(pages, out)                                              \
   pmm_alloc(0, 0, (pages), PMM_POLICY_STRICT, (out))
