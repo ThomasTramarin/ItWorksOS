@@ -5,6 +5,8 @@
 #include <boot/boot_info.h>
 #include <mm/layout.h>
 
+#define PMM_FRAME_SIZE 4096
+
 enum pmm_policy { PMM_POLICY_STRICT = 0, PMM_POLICY_FALLBACK = 1 };
 
 /* DMA16 and LOWMEM require a STRICT policy*/
