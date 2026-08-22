@@ -30,7 +30,7 @@
 #define VGA_ROWS 25
 
 // VGA memory address
-#define VGA_MEM_ADDR 0xB8000
+#define VGA_MEM_ADDR 0xC00B8000
 
 // Standard dark colors
 #define VGA_COLOR_BLACK 0x00
