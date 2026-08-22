@@ -20,7 +20,6 @@
 extern uint8_t kernel_start[];
 extern uint8_t kernel_end[];
 
-#define PMM_FRAME_SIZE 4096
 #define PMM_LOG "PMM: "
 
 #define KERNEL_VIRT_BASE 0xC0000000
