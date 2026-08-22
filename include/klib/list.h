@@ -176,4 +176,31 @@ static inline struct list_node *list_pop_back(struct list *list) {
   return node;
 }
 
+/**
+ * @brief Replaces a node in a list with another node
+ *
+ * @param old_node Node currently linked to the list
+ * @param new_node Node to insert in its place
+ *
+ * @pre old_node must be linked to a list
+ * @pre new_node must not be linked to a list
+ */
+static inline void list_replace(struct list_node *old_node,
+                                struct list_node *new_node) {
+  new_node->prev = old_node->prev;
+  new_node->next = old_node->next;
+
+  old_node->prev->next = new_node;
+  old_node->next->prev = new_node;
+
+  old_node->next = NULL;
+  old_node->prev = NULL;
+}
+
+/**
+ * @brief Iterate over each node in the list from front to back
+ */
+#define list_for_each(node, list)                                              \
+  for ((node) = (list)->head.next; node != &(list)->head; (node) = (node)->next)
+
 #endif
