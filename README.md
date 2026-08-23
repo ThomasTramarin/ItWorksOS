@@ -1,28 +1,17 @@
-# IwomhOS (ItWorksOnMyHP Operating System)
+# ItWorksOS (IWOS)
 
-A bare-metal kernel for the x86 architecture 
+A bare-metal kernel for the x86 IA-32 architecture.
+
+> Note: Originally named **ItWorksOnMyHP-OS** as a joke about the classic "it works on my machine", the project was renamed to **ItWorksOS** to reflect its primary goal: learning how operating systems work by building a small one that actually works.
 
 > Note: this project is still under active development
 
 ## Overview
 
-This is a learning project focused on understanding low-level system management.
+ItWorksOS is an educational operating system kernel developed to explore low-level system software and OS internals from scratch.
 
-## Features
-- **Architecture**: x86 32-bit (Protected Mode)
-- **Bootloader**: Minimal bootloader on MBR (Master Boot Record)
-- **GDT**: Basic Global Description Table implementation
-- **IDT**: Basic IDT implementation and centralized ISR dispatcher
-- **Exceptions**: Dedicated CPU exception handlers (0-31) with registers dump and Kernel Panic screen  
-- **PIC**: Programmable Interrupt Controller (8259A) driver implementation (initialization, IRQs remap, spurious IRQ handling)
-- **VGA**: Vga text mode driver
-- **Timer**: Timer interrupt driver (Programmable Interval Timer)
-- **Kernel Library**:   
-    - `conv`: Conversion module (Integer to ASCII function)
-    - `va`: Variadic function arguments module  
-    - `cui`: Character User Interface kernel module (abstraction layer over the VGA driver)
-    - `time`: Time module providing system tick counter and sleep functionality
-    - `types`: Basic data type definitions
+## Documentation
+Technical documentation for internal subsystems is available in [`docs/`](docs/)
 
 ## Prerequisites
 - `nasm`
@@ -34,9 +23,9 @@ This is a learning project focused on understanding low-level system management.
 ## Build & Run
 ```bash
 
-# clone the repository
-git clone https://github.com/ThomasTramarin/ItWorksOnMyHP-OS.git
-cd ItWorksOnMyHP-OS
+# Clone the repository
+git clone https://github.com/ThomasTramarin/ItWorksOS.git
+cd ItWorksOS
 
 # Make the script executable
 chmod +x ./build.sh
@@ -44,6 +33,22 @@ chmod +x ./build.sh
 # Build the project
 ./build.sh
 
-# run in QEMU
-qemu-system-i386 -hda bin/os.bin
+# Build and launch QEMU
+./build.sh run
+
+# Clean build files
+./build.sh clean
+
+```
+
+## Real Machine Testing
+To test the operating system on real hardware, you can write the generated raw disk image (`bin/disk.img`) directly to a physical storage device, such as a USB flash drive.
+
+> Warning: The `bin/disk.img` file contains the raw layout of a 64 MiB drive, formatted using MBR as partition scheme and FAT32 as the file system. Writing it to a USB drive will overwrite all existing data on that device.
+
+### Writing to USB (Linux)
+Identify your USB device (e.g. `/dev/sdX`) and write the image using `dd`:
+```bash
+# Replace /dev/sdX with your actual USB device
+sudo dd if=bin/disk.img of=/dev/sdX bs=4M status=progress conv=fsync
 ```
