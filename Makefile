@@ -68,7 +68,7 @@ KERNEL_OBJECTS := \
 .PHONY: all clean run
 
 all: $(MKIMAGE_BIN) $(DISK_IMG)
-	@echo "--- [IwomhOS] Disk image created successfully ---"
+	@echo "--- [IWOS] Disk image created successfully ---"
 
 # Host tools
 $(MKIMAGE_BIN):
@@ -147,7 +147,7 @@ $(DISK_IMG): $(MBR_BIN) $(VBR_BIN) $(STAGE2_BIN) $(KERNEL_BIN)
 clean:
 	rm -rf $(BIN_DIR)/*
 	rm -rf $(BUILD_DIR)/*
-	@echo "--- [IwomhOS] Cleaned build environment ---"
+	@echo "--- [IWOS] Cleaned build environment ---"
 
 run: all
 	qemu-system-i386 -hda $(DISK_IMG)
