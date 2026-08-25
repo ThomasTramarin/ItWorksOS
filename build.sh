@@ -12,17 +12,21 @@ echo "--- [IWOS] Cross-compiler toolchain loaded ---"
 case "$1" in
     run)
         make clean
-        make run
-        ;;
-    clean)
-        make clean
+        make BUILD=debug run
         ;;
     build|"")
         make clean
-        make
+        make BUILD=debug
+        ;;
+    release)
+        make clean
+        make BUILD=release
+        ;;
+    clean)
+        make BUILD=debug clean
         ;;
     *)
-        echo "Usage: $0 [build|run|clean]"
+        echo "Usage: $0 [build|release|run|clean]"
         exit 1
         ;;
 

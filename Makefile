@@ -1,7 +1,11 @@
 # Toolchain
-ASM = nasm
-CC  = i686-elf-gcc
-LD  = i686-elf-ld
+ASM 	= nasm
+CC  	= i686-elf-gcc
+LD  	= i686-elf-ld
+OBJCOPY = i686-elf-objcopy
+GDB     = i686-elf-gdb
+
+BUILD ?= debug
 
 # Project Directories
 SRC_DIR          = ./src
@@ -17,6 +21,7 @@ MKIMAGE_BIN = $(BUILD_DIR)/tools/mkimage/mkimage
 BOOT_DIR   = $(SRC_DIR)/boot/x86
 
 # Output Files
+KERNEL_ELF = $(BUILD_DIR)/kernel.elf
 KERNEL_BIN 	= $(BIN_DIR)/kernel.bin
 
 DISK_IMG 	= $(BIN_DIR)/disk.img
@@ -31,17 +36,22 @@ KERNEL_ENTRY_OBJ := $(BUILD_DIR)/arch/x86/kernel.asm.o
 
 # Compiler Flags
 CFLAGS = \
-		-g \
 		-ffreestanding \
 		-nostdlib \
 		-nostartfiles \
 		-nodefaultlibs \
 		-Wall \
-		-O0 \
+		-Wextra \
 		-std=gnu99 \
 		-I$(INCLUDE_DIR) \
 		-I$(ARCH_INCLUDE_DIR) \
 		-DARCH_X86
+
+ifeq ($(BUILD),debug)
+	CFLAGS += -g3 -O0
+else ifeq ($(BUILD),release)
+	CFLAGS += -O2
+endif
 
 # Automatically discover kernel sources (to build the singce kernel.bin)
 # Everything under src/ except bootloader sources belongs to the kernel source tree.
@@ -65,7 +75,7 @@ KERNEL_OBJECTS := \
 	$(C_OBJECTS)
 
 # Default target
-.PHONY: all clean run
+.PHONY: all clean run debug
 
 all: $(MKIMAGE_BIN) $(DISK_IMG)
 	@echo "--- [IWOS] Disk image created successfully ---"
@@ -122,15 +132,20 @@ $(BUILD_DIR)/completeKernel.o: $(KERNEL_OBJECTS)
 	@echo "Relocating kernel objects..."
 	$(LD) -g -r $(KERNEL_OBJECTS) -o $@
 
-# Final kernel binary
-$(KERNEL_BIN): $(BUILD_DIR)/completeKernel.o linker.ld
+# Kernel.elf Executable file
+$(KERNEL_ELF): $(BUILD_DIR)/completeKernel.o linker.ld
 	@mkdir -p $(dir $@)
-	@echo "Linking kernel..."
-	$(CC) \
-		$(CFLAGS) \
+	@echo "Linking kernel ELF..."
+	$(LD) \
 		-T linker.ld \
 		-o $@ \
 		$<
+
+# Kernel Binary
+$(KERNEL_BIN): $(KERNEL_ELF)
+	@mkdir -p $(dir $@)
+	@echo "Extracting raw kernel binary..."
+	$(OBJCOPY) -O binary $< $@
 
 # Disk image generation
 $(DISK_IMG): $(MBR_BIN) $(VBR_BIN) $(STAGE2_BIN) $(KERNEL_BIN)
@@ -150,5 +165,4 @@ clean:
 	@echo "--- [IWOS] Cleaned build environment ---"
 
 run: all
-	qemu-system-i386 -hda $(DISK_IMG)
-
+	qemu-system-i386 -drive file=$(DISK_IMG),format=raw
