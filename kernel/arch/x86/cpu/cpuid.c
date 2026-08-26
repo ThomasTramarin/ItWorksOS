@@ -1,7 +1,7 @@
-#include "kernel/printk.h"
-#include <arch/x86/cpu/cpuid.h>
-#include <arch/x86/cpu/flags.h>
+#include <arch/cpu/cpuid.h>
+#include <arch/cpu/flags.h>
 #include <base/bit.h>
+#include <kernel/printk.h>
 #include <klib/memory.h>
 
 struct x86_cpuid_regs {

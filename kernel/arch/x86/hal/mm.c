@@ -1,4 +1,4 @@
-#include <arch/x86/cpu/control.h>
+#include <arch/cpu/control.h>
 #include <base/bit.h>
 #include <base/stdint.h>
 #include <hal/mm.h>

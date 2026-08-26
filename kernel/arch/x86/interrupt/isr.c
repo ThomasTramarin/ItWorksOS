@@ -1,10 +1,10 @@
-#include <arch/x86/cpu/gdt.h>
-#include <arch/x86/interrupts/exception.h>
-#include <arch/x86/interrupts/idt.h>
-#include <arch/x86/interrupts/irq.h>
-#include <arch/x86/interrupts/isr.h>
-#include <arch/x86/interrupts/nmi.h>
-#include <arch/x86/interrupts/pic.h>
+#include <arch/cpu/gdt.h>
+#include <arch/interrupts/exception.h>
+#include <arch/interrupts/idt.h>
+#include <arch/interrupts/irq.h>
+#include <arch/interrupts/isr.h>
+#include <arch/interrupts/nmi.h>
+#include <arch/interrupts/pic.h>
 
 extern void *x86_isr_stub_table[X86_IDT_ENTRIES];
 

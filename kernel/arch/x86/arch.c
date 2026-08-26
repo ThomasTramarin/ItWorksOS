@@ -1,9 +1,9 @@
-#include <arch/x86/cpu/cpuid.h>
-#include <arch/x86/cpu/flags.h>
-#include <arch/x86/cpu/gdt.h>
-#include <arch/x86/interrupts/idt.h>
-#include <arch/x86/interrupts/isr.h>
-#include <arch/x86/interrupts/pic.h>
+#include <arch/cpu/cpuid.h>
+#include <arch/cpu/flags.h>
+#include <arch/cpu/gdt.h>
+#include <arch/interrupts/idt.h>
+#include <arch/interrupts/isr.h>
+#include <arch/interrupts/pic.h>
 #include <kernel/arch.h>
 #include <kernel/panic.h>
 

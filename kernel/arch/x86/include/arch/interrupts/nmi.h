@@ -1,7 +1,7 @@
 #ifndef ARCH_X86_INTERRUPTS_NMI_H
 #define ARCH_X86_INTERRUPTS_NMI_H
 
-#include <arch/x86/interrupts/frame.h>
+#include <arch/interrupts/frame.h>
 
 /**
  * @brief x86 Non-Maskable Interrupt handler

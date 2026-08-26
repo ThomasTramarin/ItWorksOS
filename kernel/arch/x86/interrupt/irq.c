@@ -1,5 +1,5 @@
-#include <arch/x86/interrupts/irq.h>
-#include <arch/x86/interrupts/pic.h>
+#include <arch/interrupts/irq.h>
+#include <arch/interrupts/pic.h>
 
 void x86_irq_handler(struct x86_interrupt_frame *frame) {
   /*

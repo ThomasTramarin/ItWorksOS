@@ -1,4 +1,4 @@
-#include <arch/x86/cpu/flags.h>
+#include <arch/cpu/flags.h>
 #include <base/bit.h>
 #include <hal/interrupt.h>
 

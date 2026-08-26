@@ -1,4 +1,4 @@
-#include <arch/x86/io.h>
+#include <arch/io.h>
 #include <hal/port.h>
 
 /**

@@ -1,7 +1,7 @@
 #ifndef ARCH_X86_INTERRUPTS_ISR_H
 #define ARCH_X86_INTERRUPTS_ISR_H
 
-#include <arch/x86/interrupts/frame.h>
+#include <arch/interrupts/frame.h>
 #include <base/stdint.h>
 
 /**

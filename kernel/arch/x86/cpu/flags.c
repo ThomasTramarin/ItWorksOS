@@ -1,5 +1,5 @@
-#include "base/bit.h"
-#include <arch/x86/cpu/flags.h>
+#include <arch/cpu/flags.h>
+#include <base/bit.h>
 
 uint32_t x86_eflags_read(void) {
   uint32_t flags;

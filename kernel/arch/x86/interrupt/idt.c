@@ -1,4 +1,4 @@
-#include <arch/x86/interrupts/idt.h>
+#include <arch/interrupts/idt.h>
 #include <base/bit.h>
 #include <klib/memory.h>
 

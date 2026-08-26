@@ -1,4 +1,4 @@
-#include <arch/x86/interrupts/exception.h>
+#include <arch/interrupts/exception.h>
 #include <kernel/exception.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>

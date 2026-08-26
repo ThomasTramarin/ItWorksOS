@@ -1,4 +1,4 @@
-#include <arch/x86/io.h>
+#include <arch/io.h>
 #include <base/stdint.h>
 
 uint8_t x86_inb(uint16_t port) {

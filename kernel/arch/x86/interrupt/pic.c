@@ -1,5 +1,5 @@
-#include <arch/x86/interrupts/pic.h>
-#include <arch/x86/io.h>
+#include <arch/interrupts/pic.h>
+#include <arch/io.h>
 #include <base/bit.h>
 
 /**
