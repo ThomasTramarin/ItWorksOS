@@ -166,3 +166,9 @@ clean:
 
 run: all
 	qemu-system-i386 -drive file=$(DISK_IMG),format=raw
+
+debug: all	
+	qemu-system-i386 -drive file=$(DISK_IMG),format=raw -s -S
+
+gdb:
+	$(GDB) $(KERNEL_ELF)

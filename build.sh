@@ -22,11 +22,18 @@ case "$1" in
         make clean
         make BUILD=release
         ;;
+    debug)
+        make clean
+        make BUILD=debug debug
+        ;;
+    gdb)
+        make BUILD=debug gdb
+        ;;
     clean)
         make BUILD=debug clean
         ;;
     *)
-        echo "Usage: $0 [build|release|run|clean]"
+        echo "Usage: $0 [build|release|debug|gdb|run|clean]"
         exit 1
         ;;
 

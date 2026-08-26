@@ -17,6 +17,7 @@ Technical documentation for internal subsystems is available in [`docs/`](docs/)
 - `nasm`
 - `i686-elf-gcc`: C cross-compiler
 - `i686-elf-ld`: Linker
+- `i686-elf-gdb`: GDB for the i686-elf target
 - `make`
 - `qemu-system-i386`: Emulator
 
@@ -30,14 +31,20 @@ cd ItWorksOS
 # Make the script executable
 chmod +x ./build.sh
 
-# Build the project
-./build.sh
+# Build the project (debug)
+./build.sh build
 
 # Build and launch QEMU
 ./build.sh run
 
 # Clean build files
 ./build.sh clean
+
+# Build and launch qemu in debug mode
+./build.sh debug
+
+# Connect GDB to the running QEMU instance (on a separate shell)
+./build.sh gdb
 
 ```
 
