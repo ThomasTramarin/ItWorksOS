@@ -1,0 +1,2 @@
+DEBUG     ?= 1
+OPT_LEVEL ?= 0
