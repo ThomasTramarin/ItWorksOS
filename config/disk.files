@@ -1,0 +1,2 @@
+../../build/bootloader/stage2.bin:boot/stage2.bin
+../../build/kernel/kernel.bin:boot/kernel.bin
