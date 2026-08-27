@@ -10,27 +10,23 @@ echo "--- [IWOS] Cross-compiler toolchain loaded ---"
 
 # CLI parsing
 case "$1" in
-    run)
-        make clean
+    run|r)
         make BUILD=debug run
         ;;
     build|"")
-        make clean
         make BUILD=debug
         ;;
     release)
-        make clean
         make BUILD=release
         ;;
     debug)
-        make clean
-        make BUILD=debug debug
+        make debug
         ;;
     gdb)
-        make BUILD=debug gdb
+        make gdb
         ;;
-    clean)
-        make BUILD=debug clean
+    clean|c)
+        make clean
         ;;
     *)
         echo "Usage: $0 [build|release|debug|gdb|run|clean]"

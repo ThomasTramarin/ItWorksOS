@@ -10,11 +10,11 @@ ASFLAGS = -f bin \
 	-I$(ARCH)/stage2/
 
 
-BUILD = ../build/bootloader
+BUILD_DIR := ../build/bootloader
 
-MBR_BIN := $(BUILD)/mbr.bin
-VBR_BIN := $(BUILD)/fat32_vbr.bin
-STAGE2_BIN := $(BUILD)/stage2.bin
+MBR_BIN := $(BUILD_DIR)/mbr.bin
+VBR_BIN := $(BUILD_DIR)/fat32_vbr.bin
+STAGE2_BIN := $(BUILD_DIR)/stage2.bin
 
 .PHONY: all clean
 
@@ -34,4 +34,4 @@ $(STAGE2_BIN): $(ARCH)/stage2/stage2.asm
 	$(Q)$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf $(BUILD)
+	rm -rf $(BUILD_DIR)

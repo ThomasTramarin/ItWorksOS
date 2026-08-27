@@ -28,23 +28,23 @@ Technical documentation for internal subsystems is available in [`docs/`](docs/)
 git clone https://github.com/ThomasTramarin/ItWorksOS.git
 cd ItWorksOS
 
-# Make the script executable
-chmod +x ./build.sh
+# Make the build script executable
+chmod +x ./iwos
 
 # Build the project (debug)
-./build.sh build
+./iwos build
 
 # Build and launch QEMU
-./build.sh run
+./iwos run
 
 # Clean build files
-./build.sh clean
+./iwos clean
 
 # Build and launch qemu in debug mode
-./build.sh debug
+./iwos debug
 
 # Connect GDB to the running QEMU instance (on a separate shell)
-./build.sh gdb
+./iwos gdb
 
 ```
 

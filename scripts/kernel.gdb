@@ -7,3 +7,4 @@ set disassemble-next-line on
 target remote localhost:1234
 
 break _start
+break kmain
