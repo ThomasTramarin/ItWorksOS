@@ -36,6 +36,10 @@ void kmain(uint32_t magic, paddr_t boot_info_phys) {
     panic("Failed to initialize the IRQ generic subsystem");
   }
 
+  if (arch_irqchip_init() < 0) {
+    panic("Failed to initialize the architecture-specific IRQ chip");
+  }
+
   hal_interrupt_enable();
 
   printk("Welcome to ItWorksOnMyHP\n");
