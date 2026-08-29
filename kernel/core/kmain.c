@@ -1,6 +1,7 @@
 #include <boot/boot_info.h>
 #include <hal/cpu.h>
 #include <hal/interrupt.h>
+#include <irq/irq.h>
 #include <kernel/arch.h>
 #include <kernel/kmain.h>
 #include <kernel/panic.h>
@@ -30,6 +31,10 @@ void kmain(uint32_t magic, paddr_t boot_info_phys) {
   kheap_dump();
 
   arch_init();
+
+  if (irq_init() < 0) {
+    panic("Failed to initialize the IRQ generic subsystem");
+  }
 
   hal_interrupt_enable();
 

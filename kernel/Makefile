@@ -5,6 +5,7 @@ include ../config/arch/$(ARCH).mk
 
 CORE_DIR          := core
 MM_DIR            := mm
+IRQ_DIR 		  := irq
 KLIB_DIR          := klib
 DRIVERS_DIR       := drivers
 INCLUDE_DIR       := include
@@ -44,6 +45,7 @@ C_SOURCES := \
 	$(shell find \
 		$(CORE_DIR) \
 		$(MM_DIR) \
+		$(IRQ_DIR) \
 		$(KLIB_DIR) \
 		$(DRIVERS_DIR) \
 		-name '*.c' \
