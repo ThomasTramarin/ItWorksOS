@@ -52,6 +52,41 @@ int32_t irq_free_range(irq_t first_irq, uint32_t n);
 bool irq_is_allocated(irq_t irq);
 
 /**
+ * @brief Register a handler for a kernel virtual IRQ
+ *
+ * @param irq Kernel virtual IRQ number
+ * @param handler Handler function to invoke when the IRQ is dispatched
+ *
+ * @return KERR_OK on success or a negative kernel error code
+ */
+int32_t irq_request(irq_t irq, irq_handler_t handler);
+
+/**
+ * @brief Unregister the handler associated with a kernel virtual IRQ
+ *
+ * @param irq Kernel virtual IRQ number
+ *
+ * @return KERR_OK on success or a negative kernel error code
+ */
+int32_t irq_free(irq_t irq);
+
+/**
+ * @brief Enable a kernel virtual IRQ
+ *
+ * @param irq Kernel virtual IRQ number
+ * @return KERR_OK on success or a negative kernel error code
+ */
+int32_t irq_enable(irq_t irq);
+
+/**
+ * @brief Disable a kernel virtual IRQ
+ *
+ * @param irq Kernel virtual IRQ number
+ * @return KERR_OK on success or a negative kernel error code
+ */
+int32_t irq_disable(irq_t irq);
+
+/**
  * @brief Dispatch an incoming hardware IRQ
  *
  * This function is called by the architecture-specific IRQ handler.

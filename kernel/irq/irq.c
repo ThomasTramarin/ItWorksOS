@@ -148,3 +148,31 @@ int32_t irq_dispatch(struct irq_chip *chip, struct irq_map *map,
 
   return KERR_OK;
 }
+
+int32_t irq_enable(irq_t irq) {
+  if (irq >= IRQ_MAX)
+    return -KERR_INVAL;
+
+  struct irq_desc *desc = irq_desc_get(irq);
+
+  if (!desc || !desc->chip)
+    return -KERR_NOENT;
+
+  desc->chip->enable(desc);
+
+  return KERR_OK;
+}
+
+int32_t irq_disable(irq_t irq) {
+  if (irq >= IRQ_MAX)
+    return -KERR_INVAL;
+
+  struct irq_desc *desc = irq_desc_get(irq);
+
+  if (!desc || !desc->chip)
+    return -KERR_NOENT;
+
+  desc->chip->disable(desc);
+
+  return KERR_OK;
+}
