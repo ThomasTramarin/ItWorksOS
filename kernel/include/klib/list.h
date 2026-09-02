@@ -28,6 +28,16 @@ struct list {
 };
 
 /**
+ * @brief Static initializer for an empty list
+ *
+ * @param name Name of the list structure
+ */
+#define LIST_INIT(name)                                                        \
+  {                                                                            \
+    .head = {.next = &(name).head, .prev = &(name).head }                      \
+  }
+
+/**
  * @brief Initialize an empty list
  *
  * @param list

@@ -8,6 +8,7 @@ MM_DIR            := mm
 IRQ_DIR 		  := irq
 KLIB_DIR          := klib
 DRIVERS_DIR       := drivers
+DEVICE_DIR        := device
 INCLUDE_DIR       := include
 ARCH_DIR          := arch/$(ARCH)
 ARCH_INCLUDE_DIR  := $(ARCH_DIR)/include
@@ -48,6 +49,7 @@ C_SOURCES := \
 		$(IRQ_DIR) \
 		$(KLIB_DIR) \
 		$(DRIVERS_DIR) \
+		$(DEVICE_DIR) \
 		-name '*.c' \
 	)
 

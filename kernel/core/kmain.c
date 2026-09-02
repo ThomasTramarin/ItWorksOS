@@ -1,4 +1,5 @@
 #include <boot/boot_info.h>
+#include <device/platform.h>
 #include <hal/cpu.h>
 #include <hal/interrupt.h>
 #include <irq/irq.h>
@@ -38,6 +39,10 @@ void kmain(uint32_t magic, paddr_t boot_info_phys) {
 
   if (arch_irqchip_init() < 0) {
     panic("Failed to initialize the architecture-specific IRQ chip");
+  }
+
+  if (platform_init() < 0) {
+    panic("Failed to initialize platform bus");
   }
 
   hal_interrupt_enable();
