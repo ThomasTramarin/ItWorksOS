@@ -3,7 +3,6 @@
 #include <arch/cpu/gdt.h>
 #include <arch/interrupts/idt.h>
 #include <arch/interrupts/isr.h>
-#include <arch/interrupts/pic.h>
 #include <kernel/arch.h>
 #include <kernel/panic.h>
 
@@ -18,7 +17,6 @@ void arch_init(void) {
   x86_gdt_init();
   x86_idt_init();
   x86_isr_init();
-  x86_pic_init();
 
   x86_idt_load();
 }
