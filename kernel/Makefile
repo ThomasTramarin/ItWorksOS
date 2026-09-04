@@ -3,12 +3,15 @@ ARCH ?= x86
 include ../config/default.mk
 include ../config/arch/$(ARCH).mk
 
+LIBGCC := $(shell $(CC) -print-libgcc-file-name)
+
 CORE_DIR          := core
 MM_DIR            := mm
 IRQ_DIR 		  := irq
 KLIB_DIR          := klib
 DRIVERS_DIR       := drivers
 DEVICE_DIR        := device
+TIME_DIR		  := time
 INCLUDE_DIR       := include
 ARCH_DIR          := arch/$(ARCH)
 ARCH_INCLUDE_DIR  := $(ARCH_DIR)/include
@@ -50,6 +53,7 @@ C_SOURCES := \
 		$(KLIB_DIR) \
 		$(DRIVERS_DIR) \
 		$(DEVICE_DIR) \
+		$(TIME_DIR) \
 		-name '*.c' \
 	)
 
@@ -89,9 +93,9 @@ $(BUILD_DIR)/%.asm.o: %.asm
 	$(AS) -f elf32 -g $< -o $@
 
 # Link Kernel
-$(KERNEL_ELF): $(KERNEL_OBJECTS) $(KERNEL_LDSCRIPT)
+$(KERNEL_ELF): $(KERNEL_OBJECTS) $(KERNEL_LDSCRIPT) $(LIBGCC)
 	@mkdir -p $(dir $@)
-	$(LD) -T $(KERNEL_LDSCRIPT) -o $@ $(KERNEL_OBJECTS)
+	$(LD) -T $(KERNEL_LDSCRIPT) -o $@ $(KERNEL_OBJECTS) $(LIBGCC)
 
 # Extract flat kernel binary
 $(KERNEL_BIN): $(KERNEL_ELF)
