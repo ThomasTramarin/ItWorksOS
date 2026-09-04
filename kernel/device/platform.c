@@ -1,3 +1,4 @@
+#include <base/sections.h>
 #include <device/bus.h>
 #include <device/platform.h>
 #include <kernel/error.h>
@@ -29,7 +30,7 @@ static int32_t platform_probe(struct device *dev, struct driver *drv) {
 struct bus platform_bus = {
     .name = "platform", .match = platform_match, .probe = platform_probe};
 
-int32_t platform_init(void) {
+int32_t __init platform_init(void) {
 
   bus_init(&platform_bus);
 

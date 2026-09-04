@@ -3,10 +3,11 @@
 #include <arch/cpu/gdt.h>
 #include <arch/interrupts/idt.h>
 #include <arch/interrupts/isr.h>
+#include <base/sections.h>
 #include <kernel/arch.h>
 #include <kernel/panic.h>
 
-void arch_init(void) {
+void __init arch_init(void) {
   x86_cli(); // disable interrupts
   x86_cld(); // clear direction flag
 

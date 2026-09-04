@@ -1,7 +1,8 @@
+#include <base/sections.h>
 #include <kernel/error.h>
 #include <mm/mm.h>
 
-int32_t mm_init(const struct boot_mem_map_entry *map, uint16_t count) {
+int32_t __init mm_init(const struct boot_mem_map_entry *map, uint16_t count) {
   KERR_TRY(pmm_init(map, count));
 
   KERR_TRY(vmm_init());

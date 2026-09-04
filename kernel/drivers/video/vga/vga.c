@@ -1,3 +1,4 @@
+#include <base/sections.h>
 #include <base/stddef.h>
 #include <drivers/video/vga/vga.h>
 #include <hal/port.h>
@@ -6,7 +7,7 @@ static volatile struct vga_cell *text_buffer = (struct vga_cell *)VGA_MEM_ADDR;
 static struct vga_cell back_buffer[VGA_ROWS * VGA_COLS];
 static struct vga_dirty_rect dirty;
 
-void vga_init(void) {
+void __init vga_init(void) {
 
   // No dirty region at start
   dirty.x1 = VGA_COLS;

@@ -1,5 +1,6 @@
 #include <base/align.h>
 #include <base/bit.h>
+#include <base/sections.h>
 #include <base/stddef.h>
 #include <boot/boot_info.h>
 #include <kernel/error.h>
@@ -17,8 +18,8 @@
  */
 
 // from the linker
-extern uint8_t kernel_start[];
-extern uint8_t kernel_end[];
+extern uint8_t __kernel_start[];
+extern uint8_t __kernel_end[];
 
 #define PMM_LOG "PMM: "
 
@@ -144,7 +145,8 @@ static void pmm_force_reserve_range(uint32_t start_frame, size_t pages) {
   }
 }
 
-int32_t pmm_init(const struct boot_mem_map_entry *map_ptr, uint16_t count) {
+int32_t __init pmm_init(const struct boot_mem_map_entry *map_ptr,
+                        uint16_t count) {
   if (!map_ptr || count == 0)
     return -KERR_INVAL;
 
@@ -176,7 +178,7 @@ int32_t pmm_init(const struct boot_mem_map_entry *map_ptr, uint16_t count) {
       (uint32_t)(ALIGN_UP(pmm.max_addr, PMM_FRAME_SIZE) / PMM_FRAME_SIZE);
 
   // Initialize the bitmap immediately after the kernel image
-  bitmap_init(&pmm.bm, (uint32_t *)kernel_end, pmm.total_frames);
+  bitmap_init(&pmm.bm, (uint32_t *)__kernel_end, pmm.total_frames);
 
   // mark all frames as reserved by default
   for (uint32_t i = 0; i < pmm.total_frames; i++) {
@@ -207,9 +209,9 @@ int32_t pmm_init(const struct boot_mem_map_entry *map_ptr, uint16_t count) {
   uint32_t first_mib_frames = (1024 * 1024) / PMM_FRAME_SIZE;
   pmm_force_reserve_range(0, first_mib_frames);
 
-  paddr_t kernel_start_phys = (paddr_t)(kernel_start - KERNEL_VIRT_BASE);
+  paddr_t kernel_start_phys = (paddr_t)(__kernel_start - KERNEL_VIRT_BASE);
 
-  paddr_t kernel_end_phys = (paddr_t)(kernel_end - KERNEL_VIRT_BASE);
+  paddr_t kernel_end_phys = (paddr_t)(__kernel_end - KERNEL_VIRT_BASE);
 
   // Reserve the kernel image
   uint32_t kernel_start_frame =
@@ -252,8 +254,8 @@ int32_t pmm_init(const struct boot_mem_map_entry *map_ptr, uint16_t count) {
   uint32_t allocatable_mib =
       (uint32_t)((pmm.free_frames * PMM_FRAME_SIZE) / (1024 * 1024));
 
-  pr_debug(PMM_LOG "Kernel start (%p), Kernel end (%p)\n", kernel_start,
-           kernel_end);
+  pr_debug(PMM_LOG "Kernel start (%p), Kernel end (%p)\n", __kernel_start,
+           __kernel_end);
 
   pr_debug(PMM_LOG "Physical Address Space: %u MiB\n",
            physical_address_space_mib);

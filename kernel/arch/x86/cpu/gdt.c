@@ -1,5 +1,6 @@
 #include <arch/cpu/gdt.h>
 #include <base/bit.h>
+#include <base/sections.h>
 
 #include <base/stdint.h>
 #include <klib/memory.h>
@@ -144,7 +145,7 @@ static void x86_gdt_set_entry(int index, struct x86_gdt_entry *e) {
 /* assembly function */
 extern void x86_gdt_flush(struct x86_gdt_descriptor *gdtr);
 
-void x86_gdt_init(void) {
+void __init x86_gdt_init(void) {
   gdt_descriptor.size = sizeof(gdt) - 1;
   gdt_descriptor.offset = (uint32_t)gdt;
 

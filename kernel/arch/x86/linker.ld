@@ -4,19 +4,24 @@ SECTIONS
 {
     . = 0xC0010000;
 
-    kernel_start = .;
-
-    .text ALIGN(4096) : AT(ADDR(.text) - 0xC0000000)
-    {
-        *kernel.asm.o(.text)
-        *(.text*)
-    }
+    __kernel_start = .;
 
     .init.text ALIGN(4096) : AT(ADDR(.init.text) - 0xC0000000)
     {
         __init_text_start = .;
+        KEEP(*kernel.asm.o(.text))
         *(.init.text*)
         __init_text_end = .;
+    }
+
+    .text ALIGN(4096) : AT(ADDR(.text) - 0xC0000000)
+    {
+        *(.text*)
+    }
+
+    .data ALIGN(4096) : AT(ADDR(.data) - 0xC0000000)
+    {
+        *(.data*)
     }
 
     .rodata ALIGN(4096) : AT(ADDR(.rodata) - 0xC0000000)
@@ -31,26 +36,21 @@ SECTIONS
         __initcall_devdrv_end = .;
     }
 
-    .data ALIGN(4096) : AT(ADDR(.data) - 0xC0000000)
+    .init.bss ALIGN(4096) : AT(ADDR(.init.bss) - 0xC0000000)
     {
-        *(.data*)
-    }
-
-    .bootstrap_bss ALIGN(4096) : AT(ADDR(.bootstrap_bss) - 0xC0000000)
-    {
-        bootstrap_bss_start = .;
-        *(.bootstrap_bss*)
-        bootstrap_bss_end = .;
+        __init_bss_start = .;
+        *(.init.bss*)
+        __init_bss_end = .;
     }
 
     .bss ALIGN(4096) : AT(ADDR(.bss) - 0xC0000000)
     {
-        bss_start = .;
+        __bss_start = .;
         *(COMMON)
         *(.bss*)
-        bss_end = .;
+        __bss_end = .;
     }
 
     . = ALIGN(4096);
-    kernel_end = .;
+    __kernel_end = .;
 }

@@ -1,9 +1,12 @@
+#include <base/compiler.h>
+#include <base/sections.h>
 #include <boot/boot_info.h>
 #include <device/platform.h>
 #include <hal/cpu.h>
 #include <hal/interrupt.h>
 #include <irq/irq.h>
 #include <kernel/arch.h>
+#include <kernel/initcall.h>
 #include <kernel/kmain.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
@@ -11,7 +14,7 @@
 #include <klib/cui.h>
 #include <mm/mm.h>
 
-void kmain(uint32_t magic, paddr_t boot_info_phys) {
+void __noreturn kmain(uint32_t magic, paddr_t boot_info_phys) {
 
   struct boot_info *info = (struct boot_info *)PHYS_TO_VIRT(boot_info_phys);
 
@@ -29,7 +32,6 @@ void kmain(uint32_t magic, paddr_t boot_info_phys) {
   if (mm_init(map, info->memory_map_count) < 0) {
     panic("Failed to initialize the Memory Manager");
   }
-  kheap_dump();
 
   arch_init();
 
@@ -45,9 +47,13 @@ void kmain(uint32_t magic, paddr_t boot_info_phys) {
     panic("Failed to initialize platform bus");
   }
 
-  hal_interrupt_enable();
+  initcalls_invoke_devdrv();
 
-  printk("Welcome to ItWorksOnMyHP\n");
+  kheap_dump();
+
+  printk("Welcome to ItWorksOS\n");
+
+  hal_interrupt_enable();
 
   // CPU halt
   while (1) {

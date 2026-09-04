@@ -1,3 +1,4 @@
+#include <base/compiler.h>
 #include <base/stdarg.h>
 #include <base/stdbool.h>
 #include <kernel/panic.h>
@@ -5,16 +6,14 @@
 
 static bool panicking = false;
 
-void panic(const char *fmt, ...) {
+void __noreturn panic(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
 
   vpanic(fmt, args);
-
-  va_end(args);
 }
 
-void vpanic(const char *fmt, va_list args) {
+void __noreturn vpanic(const char *fmt, va_list args) {
   // TODO: call HAL functions
 
   // disable interrupts

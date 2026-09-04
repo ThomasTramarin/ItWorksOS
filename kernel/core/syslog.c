@@ -1,3 +1,4 @@
+#include <base/sections.h>
 #include <kernel/syslog.h>
 #include <klib/memory.h>
 #include <klib/ringbuf.h>
@@ -7,7 +8,7 @@ static uint8_t syslog_storage[SYSLOG_BUFFER_SIZE];
 static ringbuf_t syslog_rb;
 static bool syslog_ready = false;
 
-void syslog_init(void) {
+void __init syslog_init(void) {
   ringbuf_init(&syslog_rb, syslog_storage, SYSLOG_BUFFER_SIZE);
   syslog_ready = true;
 }
@@ -37,7 +38,7 @@ size_t syslog_read(char *dst, size_t size) {
   // tail is not incremented so this function does not consume bytes
   // tail is only incremented by ringbuf_overwrite when the buffer becomes full
 
-  if (!syslog_ready)
+  if (!syslog_ready || !dst || size == 0)
     return 0;
 
   size_t len = ringbuf_len(&syslog_rb);

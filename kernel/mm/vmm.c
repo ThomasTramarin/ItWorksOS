@@ -1,3 +1,4 @@
+#include <base/sections.h>
 #include <base/stddef.h>
 #include <hal/mm.h>
 #include <kernel/error.h>
@@ -36,7 +37,7 @@ struct vm_space {
 static struct vm_space kernel_vm_space;
 extern struct hal_vm_space kernel_arch_vm_space;
 
-int32_t vmm_init(void) {
+int32_t __init vmm_init(void) {
 
   kernel_vm_space.arch = &kernel_arch_vm_space;
 

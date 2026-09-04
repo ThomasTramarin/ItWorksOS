@@ -5,10 +5,11 @@
 #include <arch/interrupts/isr.h>
 #include <arch/interrupts/nmi.h>
 #include <arch/interrupts/pic.h>
+#include <base/sections.h>
 
 extern void *x86_isr_stub_table[X86_IDT_ENTRIES];
 
-void x86_isr_init(void) {
+void __init x86_isr_init(void) {
 
   struct x86_idt_gate gate = {
       .selector = X86_GDT_SELECTOR_KERN_CODE,

@@ -44,7 +44,7 @@ x86_isr_stub%1:
 
 %endmacro
 
-
+section .text
 ISR_NOERROR 0
 ISR_NOERROR 1
 ISR_NOERROR 2
@@ -132,6 +132,7 @@ x86_isr_common:
 ; table of function pointers to isr stubs
 global x86_isr_stub_table
 
+section .init.data
 x86_isr_stub_table:
 %assign i 0
 %rep 256

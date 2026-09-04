@@ -2,8 +2,8 @@
 global _start
 extern kmain
 
-extern bss_start
-extern bss_end
+extern __bss_start
+extern __bss_end
 
 ; X86 Kernel entry point
 ;
@@ -38,7 +38,7 @@ STACK_SIZE      equ 16384      ; 16 KiB
 ; If the page directory were stored in .bss, clearing the section would also
 ; invalidate the active page directory pointed by CR3, causing a page fault
 
-section .bootstrap_bss nobits
+section .init.bss nobits
 align 4096      ; alignment required by CR3
 boot_page_directory:
     resb 4096
@@ -50,7 +50,7 @@ kernel_stack_bottom:
     resb STACK_SIZE
 kernel_stack_top:
 
-section .text
+section .init.text
 _start:
     mov esi, eax ; magic value
     mov edi, ebx ; pointer to boot_info (physical address)
@@ -94,8 +94,8 @@ higher_half:
 
     ; Zero .bss section
     xor eax, eax
-    mov edi, bss_start
-    mov ecx, bss_end
+    mov edi, __bss_start
+    mov ecx, __bss_end
     sub ecx, edi
     rep stosb
 

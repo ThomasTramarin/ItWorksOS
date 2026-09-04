@@ -34,8 +34,11 @@ CFLAGS = \
 		-I$(INCLUDE_DIR) \
 		-I$(ARCH_INCLUDE_DIR) \
 
+ASFLAGS = -f elf32
+
 ifeq ($(BUILD),debug)
 	CFLAGS += -g3 -O0
+	ASFLAGS += -g
 else ifeq ($(BUILD),release)
 	CFLAGS += -O2
 endif
@@ -82,7 +85,7 @@ all: $(KERNEL_BIN)
 # Generate object files
 $(KERNEL_ENTRY_OBJ): $(KERNEL_ENTRY_SRC)
 	@mkdir -p $(dir $@)
-	$(AS) -f elf32 -g $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
@@ -90,12 +93,15 @@ $(BUILD_DIR)/%.o: %.c
 
 $(BUILD_DIR)/%.asm.o: %.asm
 	@mkdir -p $(dir $@)
-	$(AS) -f elf32 -g $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 # Link Kernel
 $(KERNEL_ELF): $(KERNEL_OBJECTS) $(KERNEL_LDSCRIPT) $(LIBGCC)
 	@mkdir -p $(dir $@)
 	$(LD) -T $(KERNEL_LDSCRIPT) -o $@ $(KERNEL_OBJECTS) $(LIBGCC)
+ifeq ($(BUILD),release)
+	$(STRIP) --strip-all $@
+endif
 
 # Extract flat kernel binary
 $(KERNEL_BIN): $(KERNEL_ELF)

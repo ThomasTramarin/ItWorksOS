@@ -1,3 +1,4 @@
+#include <base/sections.h>
 #include <irq/chip.h>
 #include <irq/desc.h>
 #include <irq/irq.h>
@@ -15,7 +16,7 @@
 static struct bitmap irq_allocated;
 static uint32_t irq_allocated_data[BITMAP_ELEMS(IRQ_MAX)];
 
-int32_t irq_init(void) {
+int32_t __init irq_init(void) {
   bitmap_init(&irq_allocated, irq_allocated_data, IRQ_MAX);
 
   return KERR_OK;

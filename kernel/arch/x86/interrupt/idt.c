@@ -1,5 +1,6 @@
 #include <arch/interrupts/idt.h>
 #include <base/bit.h>
+#include <base/sections.h>
 #include <klib/memory.h>
 
 struct x86_idt_raw_entry {
@@ -29,12 +30,12 @@ void x86_idt_set_gate(uint8_t vector, struct x86_idt_gate *g) {
   idt[vector].offset_high = (uint16_t)((g->handler >> 16) & 0xFFFF);
 }
 
-static inline void x86_idt_desc_init(void) {
+static void __init x86_idt_desc_init(void) {
   idt_desc.size = sizeof(idt) - 1;
   idt_desc.offset = (uint32_t)idt;
 }
 
-void x86_idt_init(void) {
+void __init x86_idt_init(void) {
   memset(idt, 0, sizeof(idt));
 
   x86_idt_desc_init();

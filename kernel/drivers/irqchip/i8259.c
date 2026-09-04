@@ -1,4 +1,5 @@
 #include <base/bit.h>
+#include <base/sections.h>
 #include <hal/port.h>
 #include <irq/chip.h>
 #include <irq/desc.h>
@@ -75,7 +76,7 @@
  *
  * The port 0x80 is not used
  */
-static void i8259_io_wait(void) { hal_port_write8(0x80, 0); }
+static void __init i8259_io_wait(void) { hal_port_write8(0x80, 0); }
 
 /**
  * @brief Performs PIC initialization (ICW1 - ICW4)
@@ -84,7 +85,7 @@ static void i8259_io_wait(void) { hal_port_write8(0x80, 0); }
  * - Slave connected to master's IRQ2 line
  * - Initializes it for working with x86
  */
-static void i8259_remap(uint8_t master_offset, uint8_t slave_offset) {
+static void __init i8259_remap(uint8_t master_offset, uint8_t slave_offset) {
 
   uint8_t mask1 = hal_port_read8(I8259_PIC1_DATA_PORT);
   uint8_t mask2 = hal_port_read8(I8259_PIC2_DATA_PORT);
@@ -144,7 +145,7 @@ static void i8259_mask_irq(struct irq_desc *desc) {
   }
 }
 
-static void i8259_mask_all(void) {
+static void __init i8259_mask_all(void) {
   hal_port_write8(I8259_PIC1_DATA_PORT, 0xFF);
   hal_port_write8(I8259_PIC2_DATA_PORT, 0xFF);
 }
@@ -274,7 +275,7 @@ static struct irq_map i8259_map;
 struct irq_chip *i8259_get_chip(void) { return &i8259_chip; }
 struct irq_map *i8259_get_map(void) { return &i8259_map; }
 
-int32_t i8259_init(void) {
+int32_t __init i8259_init(void) {
   i8259_remap(I8259_ICW2_MASTER_VECTOR_OFFSET, I8259_ICW2_SLAVE_VECTOR_OFFSET);
 
   // Disable all interrupts

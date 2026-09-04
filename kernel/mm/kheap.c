@@ -1,9 +1,10 @@
-#include "base/stdint.h"
-#include "kernel/printk.h"
 #include <base/align.h>
 #include <base/bit.h>
+#include <base/sections.h>
 #include <base/stddef.h>
+#include <base/stdint.h>
 #include <kernel/error.h>
+#include <kernel/printk.h>
 #include <klib/list.h>
 #include <mm/layout.h>
 #include <mm/pmm.h>
@@ -67,7 +68,7 @@ static struct list kheap_free_list;
 static vaddr_t kheap_start;
 static vaddr_t kheap_end;
 
-int32_t kheap_init(void) {
+int32_t __init kheap_init(void) {
   paddr_t phys;
 
   /* Try to allocate 1 MiB */
