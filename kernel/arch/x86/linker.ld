@@ -12,9 +12,23 @@ SECTIONS
         *(.text*)
     }
 
+    .init.text ALIGN(4096) : AT(ADDR(.init.text) - 0xC0000000)
+    {
+        __init_text_start = .;
+        *(.init.text*)
+        __init_text_end = .;
+    }
+
     .rodata ALIGN(4096) : AT(ADDR(.rodata) - 0xC0000000)
     {
         *(.rodata*)
+    }
+
+    .initcalls ALIGN(4096) : AT(ADDR(.initcalls) - 0xC0000000)
+    {
+        __initcall_devdrv_start = .;
+        KEEP(*(.initcall.devdrv*))
+        __initcall_devdrv_end = .;
     }
 
     .data ALIGN(4096) : AT(ADDR(.data) - 0xC0000000)
