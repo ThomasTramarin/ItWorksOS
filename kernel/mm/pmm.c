@@ -23,7 +23,7 @@ extern uint8_t __kernel_end[];
 
 #define PMM_LOG "PMM: "
 
-#define KERNEL_VIRT_BASE 0xC0000000
+#define KERNEL_VIRT_BASE ((vaddr_t)0xC0000000)
 
 static struct {
   struct bitmap bm;
@@ -96,10 +96,6 @@ static int32_t pmm_reserve(paddr_t addr, size_t pages) {
   return KERR_OK;
 }
 
-/*
- * Internal helper to mark a fixed physical range as reserved during
- * initialization.
- */
 static int32_t pmm_unreserve(paddr_t addr, size_t pages) {
   uint32_t first_frame;
 
@@ -209,9 +205,10 @@ int32_t __init pmm_init(const struct boot_mem_map_entry *map_ptr,
   uint32_t first_mib_frames = (1024 * 1024) / PMM_FRAME_SIZE;
   pmm_force_reserve_range(0, first_mib_frames);
 
-  paddr_t kernel_start_phys = (paddr_t)(__kernel_start - KERNEL_VIRT_BASE);
+  paddr_t kernel_start_phys =
+      (paddr_t)(uintptr_t)__kernel_start - KERNEL_VIRT_BASE;
 
-  paddr_t kernel_end_phys = (paddr_t)(__kernel_end - KERNEL_VIRT_BASE);
+  paddr_t kernel_end_phys = (paddr_t)(uintptr_t)__kernel_end - KERNEL_VIRT_BASE;
 
   // Reserve the kernel image
   uint32_t kernel_start_frame =
