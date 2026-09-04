@@ -23,6 +23,7 @@ enum kerror {
   KERR_OK = 0,
 
   KERR_INVAL,  /* argument(s) not valid */
+  KERR_RANGE,  /* argument(s) out of range */
   KERR_NOMEM,  /* insufficient memory */
   KERR_NOENT,  /* resource does not exist */
   KERR_EXISTS, /* the resource already exists */

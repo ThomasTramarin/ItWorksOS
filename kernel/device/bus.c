@@ -25,6 +25,8 @@ int32_t bus_register(struct bus *bus) {
 int32_t bus_add_device(struct bus *bus, struct device *dev) {
   if (!bus || !dev)
     return -KERR_INVAL;
+  pr_debug("device: registered '%s-%d' on bus '%s'\n", dev->name, dev->id,
+           bus->name);
 
   list_insert_back(&bus->devices, &dev->bus_node);
 
@@ -61,6 +63,8 @@ int32_t bus_add_driver(struct bus *bus, struct driver *drv) {
     return -KERR_INVAL;
 
   list_insert_back(&bus->drivers, &drv->bus_node);
+
+  pr_debug("driver: registered '%s' on bus '%s'\n", drv->name, bus->name);
 
   struct list_node *dev_node;
   list_for_each(dev_node, &bus->devices) {
