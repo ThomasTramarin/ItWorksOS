@@ -20,6 +20,18 @@ bool x86_interrupts_enabled(void) {
   return MASK_TEST(flags, X86_FLAGS_IF_MASK);
 }
 
+bool x86_interrupt_save_disable(void) {
+  bool enabled = x86_interrupts_enabled();
+  x86_cli();
+  return enabled;
+}
+
+void x86_interrupt_restore(bool state) {
+  if (state) {
+    x86_sti();
+  }
+}
+
 void x86_cld(void) { __asm__ __volatile__("cld" ::: "cc"); }
 void x86_std(void) { __asm__ __volatile__("std" ::: "cc"); }
 

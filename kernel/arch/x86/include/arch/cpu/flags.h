@@ -49,6 +49,8 @@ void x86_cli(void);
 void x86_sti(void);
 
 bool x86_interrupts_enabled(void);
+bool x86_interrupt_save_disable(void);
+void x86_interrupt_restore(bool state);
 
 /*
  * Direction Flag (DF)
