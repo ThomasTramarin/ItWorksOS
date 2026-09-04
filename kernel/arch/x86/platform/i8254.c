@@ -5,11 +5,9 @@
 #include <irq/irq.h>
 #include <kernel/initcall.h>
 
-extern struct irq_map i8259_map;
-
 static struct resource i8254_0_resources[] = {
     RESOURCE_PORT(0x40, 0x43),
-    RESOURCE_IRQ(0, &i8259_map), /* PIC hwirq */
+    RESOURCE_IRQ(0, NULL), /* PIC hwirq */
 };
 
 static struct platform_device i8254_0_device = {
@@ -23,6 +21,7 @@ static struct platform_device i8254_0_device = {
 };
 
 static int32_t __init i8254_device_init(void) {
+  i8254_0_resources[1].irq.map = i8259_get_map();
   return platform_device_register(&i8254_0_device);
 }
 
