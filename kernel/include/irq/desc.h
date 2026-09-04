@@ -36,6 +36,12 @@ struct irq_desc {
    * is dispatched
    */
   irq_handler_t handler;
+
+  /**
+   * Private data
+   *
+   */
+  void *dev_id;
 };
 
 /**

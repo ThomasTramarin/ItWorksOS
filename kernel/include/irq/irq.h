@@ -16,7 +16,7 @@ struct irq_desc;
 struct irq_chip;
 struct irq_map;
 
-typedef void (*irq_handler_t)(void);
+typedef void (*irq_handler_t)(void *dev_id);
 
 /**
  * @brief Initialize the generic IRQ subsystem
@@ -56,10 +56,11 @@ bool irq_is_allocated(irq_t irq);
  *
  * @param irq Kernel virtual IRQ number
  * @param handler Handler function to invoke when the IRQ is dispatched
+ * @param dev_id Private context pointer passed to the handler on dispatch
  *
  * @return KERR_OK on success or a negative kernel error code
  */
-int32_t irq_request(irq_t irq, irq_handler_t handler);
+int32_t irq_request(irq_t irq, irq_handler_t handler, void *dev_id);
 
 /**
  * @brief Unregister the handler associated with a kernel virtual IRQ

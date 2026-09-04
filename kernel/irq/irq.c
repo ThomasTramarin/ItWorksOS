@@ -77,7 +77,7 @@ bool irq_is_allocated(irq_t irq) {
   return bitmap_test(&irq_allocated, irq);
 }
 
-int32_t irq_request(irq_t irq, irq_handler_t handler) {
+int32_t irq_request(irq_t irq, irq_handler_t handler, void *dev_id) {
   if (!handler || irq >= IRQ_MAX)
     return -KERR_INVAL;
 
@@ -93,6 +93,7 @@ int32_t irq_request(irq_t irq, irq_handler_t handler) {
     return -KERR_BUSY;
 
   desc->handler = handler;
+  desc->dev_id = dev_id;
 
   return KERR_OK;
 }
@@ -142,7 +143,7 @@ int32_t irq_dispatch(struct irq_chip *chip, struct irq_map *map,
   if (!desc->handler)
     return -KERR_NOENT;
 
-  desc->handler();
+  desc->handler(desc->dev_id);
 
   chip->eoi(desc);
 
