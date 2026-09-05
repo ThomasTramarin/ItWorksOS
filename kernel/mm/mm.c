@@ -1,9 +1,13 @@
 #include <base/sections.h>
+#include <kernel/boot.h>
 #include <kernel/error.h>
 #include <mm/mm.h>
 
-int32_t __init mm_init(const struct boot_mem_map_entry *map, uint16_t count) {
-  KERR_TRY(pmm_init(map, count));
+int32_t __init mm_init(void) {
+
+  struct boot_state *boot = boot_get_state();
+
+  KERR_TRY(pmm_init(boot->memory_map, boot->memory_map_count));
 
   KERR_TRY(vmm_init());
 

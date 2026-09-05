@@ -16,6 +16,6 @@
  *
  * @return KERR_OK or negative kernel error code
  */
-int32_t mm_init(const struct boot_mem_map_entry *map, uint16_t count);
+int32_t mm_init(void);
 
 #endif

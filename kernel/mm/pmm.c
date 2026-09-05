@@ -146,14 +146,6 @@ int32_t __init pmm_init(const struct boot_mem_map_entry *map_ptr,
   if (!map_ptr || count == 0)
     return -KERR_INVAL;
 
-  pr_debug(PMM_LOG "Physical Memory Map:\n");
-
-  for (uint16_t i = 0; i < count; i++) {
-    pr_debug(PMM_LOG "[%d] base=%x len=%x type=%x attr=%x\n", i,
-             (uint32_t)map_ptr[i].base, (uint32_t)map_ptr[i].length,
-             map_ptr[i].type, map_ptr[i].attr);
-  }
-
   pmm.max_addr = 0;
 
   for (uint16_t i = 0; i < count; i++) {

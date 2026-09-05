@@ -6,6 +6,7 @@
 #include <hal/interrupt.h>
 #include <irq/irq.h>
 #include <kernel/arch.h>
+#include <kernel/boot.h>
 #include <kernel/initcall.h>
 #include <kernel/kmain.h>
 #include <kernel/panic.h>
@@ -16,25 +17,17 @@
 
 void __noreturn kmain(uint32_t magic, paddr_t boot_info_phys) {
 
-  struct boot_info *info = (struct boot_info *)PHYS_TO_VIRT(boot_info_phys);
-
   syslog_init();
-
   cui_init(VGA_COLOR_WHITE, VGA_COLOR_BLUE, 0);
+
+  struct boot_info *info = (struct boot_info *)PHYS_TO_VIRT(boot_info_phys);
+  boot_init(info);
 
   if (magic != BOOT_MAGIC) {
     panic("Invalid boot magic value");
   }
 
-  pr_debug("type: %d, mode: %u, cols: %u, rows: %u, page: %u, buf: %p",
-           info->video.type, info->video.text.mode, info->video.text.cols,
-           info->video.text.rows, info->video.text.page,
-           info->video.text.buffer);
-
-  const struct boot_mem_map_entry *map =
-      (const struct boot_mem_map_entry *)PHYS_TO_VIRT(info->memory_map_phys);
-
-  if (mm_init(map, info->memory_map_count) < 0) {
+  if (mm_init() < 0) {
     panic("Failed to initialize the Memory Manager");
   }
 

@@ -41,6 +41,8 @@ enum boot_mem_type {
   BOOT_TYPE_BAD = 5
 };
 
+#define BOOT_MEMORY_MAP_MAX 64
+
 struct boot_mem_map_entry {
   uint64_t base;
   uint64_t length;
@@ -75,6 +77,7 @@ struct boot_video {
 
 /**
  * The bootloader builds this struct and passes it to the kmain function
+ * This struct represents the ABI between the bootloader and the kernel.
  */
 struct boot_info {
   uint16_t memory_map_count; // number of entries
