@@ -26,6 +26,11 @@ void __noreturn kmain(uint32_t magic, paddr_t boot_info_phys) {
     panic("Invalid boot magic value");
   }
 
+  pr_debug("type: %d, mode: %u, cols: %u, rows: %u, page: %u, buf: %p",
+           info->video.type, info->video.text.mode, info->video.text.cols,
+           info->video.text.rows, info->video.text.page,
+           info->video.text.buffer);
+
   const struct boot_mem_map_entry *map =
       (const struct boot_mem_map_entry *)PHYS_TO_VIRT(info->memory_map_phys);
 

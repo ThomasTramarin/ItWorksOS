@@ -1,6 +1,8 @@
 #ifndef BOOT_INFO_H
 #define BOOT_INFO_H
 
+#include <base/compiler.h>
+#include <base/limits.h>
 #include <base/stdint.h>
 
 /**
@@ -44,7 +46,32 @@ struct boot_mem_map_entry {
   uint64_t length;
   uint32_t type; // boot_mem_type_t
   uint32_t attr; // ACPI attributes (BOOT_ATTR_*)
-} __attribute__((packed));
+} __packed;
+
+/**
+ * @brief struct boot_video.type
+ */
+#define BOOT_VIDEO_TYPE_INVALID 0
+#define BOOT_VIDEO_TYPE_TEXT 1
+
+/**
+ * @brief struct boot_video.text.mode
+ */
+#define BOOT_VIDEO_TEXT_MODE_03H 0x03
+
+struct boot_video {
+  uint32_t type;
+
+  union {
+    struct {
+      uint8_t mode;
+      uint8_t page;
+      uint8_t cols;
+      uint8_t rows;
+      paddr_t buffer;
+    } text;
+  };
+} __packed;
 
 /**
  * The bootloader builds this struct and passes it to the kmain function
@@ -53,6 +80,8 @@ struct boot_info {
   uint16_t memory_map_count; // number of entries
   paddr_t memory_map_phys;   // pointer to the array of entries (stored inside
                              // stage2 bootloader memory)
-} __attribute__((packed));
+
+  struct boot_video video;
+} __packed;
 
 #endif

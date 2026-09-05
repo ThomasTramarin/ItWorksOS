@@ -55,6 +55,13 @@ stage2_entry:
 
     call stage2_boot_info_init
 
+    ; store video mode information (populates boot_info.video)
+    xor ax, ax
+    mov es, ax
+    mov di, boot_info.video
+    call video_detect_mode
+    jc .err_video_detection
+
     jmp stage2_enter_protected_mode
 
 .err_disk_read:
@@ -63,6 +70,10 @@ stage2_entry:
 
 .err_e820:
     mov si, msg_err_e820
+    jmp stage2_error
+
+.err_video_detection:
+    mov si, msg_err_video_detection
     jmp stage2_error
 
 .halt:
@@ -587,8 +598,9 @@ stage2_boot_info_init:
     mov ax, [e820_count]
     mov [boot_info.memory_map_count], ax
 
-    ; e820 pointer
+    ; e820 pointer, stored as uint64_t (paddr_t)
     mov dword [boot_info.memory_map_ptr], e820_buffer
+    mov dword [boot_info.memory_map_ptr + 4], 0
 
     pop ax
     ret
@@ -598,6 +610,7 @@ stage2_boot_info_init:
 %include "video.asm"
 %include "disk_read.asm"
 %include "e820.asm"
+%include "video_detection.asm"
 
 
 
@@ -677,7 +690,8 @@ msg_err_root_cluster:               db 'ERR_INVALID_ROOT_CLUSTER', 0
 msg_err_total_sectors_16:           db 'ERR_INVALID_TOTAL_SECTORS_16', 0
 msg_err_total_sectors_32:           db 'ERR_INVALID_TOTAL_SECTORS_32', 0
 msg_err_fat_size_32:                db 'ERR_INVALID_FAT_SIZE_32', 0
-msg_err_e820:                       db 'ERR_E820_MEMORY_MAP'
+msg_err_e820:                       db 'ERR_E820_MEMORY_MAP', 0
+msg_err_video_detection:            db 'ERR_VIDEO_MODE_NOT_SUP', 0
 
 ; FAT32 filenames
 boot_dir: db 'BOOT       '
@@ -723,5 +737,6 @@ e820_count:
 
 ; boot_info structure passed to the kmain function as a pointer
 boot_info:
-    .memory_map_count:    dw 0        ; E820 entries count (2 bytes)
-    .memory_map_ptr:   dd 0        ; physical RAM pointer to the first E820 entry (4 bytes)
+    .memory_map_count:  dw 0    ; E820 entries count (2 bytes)
+    .memory_map_ptr:    dq 0    ; physical RAM pointer to the first E820 entry (8 bytes)
+    .video:             times 2 dq 0    ; struct boot_video (16 bytes)
