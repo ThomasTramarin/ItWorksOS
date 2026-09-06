@@ -1,3 +1,4 @@
+#include <base/sections.h>
 #include <boot/boot_info.h>
 #include <kernel/boot.h>
 #include <kernel/printk.h>
@@ -9,7 +10,7 @@ static struct boot_mem_map_entry kernel_boot_mmap_entries[BOOT_MEMORY_MAP_MAX];
 
 #define BOOT_LOG "Boot: "
 
-void boot_init(struct boot_info *info) {
+void __init boot_init(struct boot_info *info) {
 
   /*
    * Copy stage2 memory map into kernel memory.

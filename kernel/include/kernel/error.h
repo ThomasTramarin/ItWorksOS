@@ -29,6 +29,8 @@ enum kerror {
   KERR_EXISTS, /* the resource already exists */
   KERR_BUSY,   /* the resource is busy */
   KERR_NOSPC,  /* insufficient resource space */
+  KERR_NOSUP,  /* operation or configuration not supported */
+  KERR_NODEV,  /* no device*/
 };
 
 typedef enum kerror kerror_t;
