@@ -4,8 +4,8 @@
 #include <base/stddef.h>
 #include <boot/boot_info.h>
 #include <kernel/error.h>
-#include <kernel/printk.h>
 #include <klib/bitmap.h>
+#include <log/printk.h>
 #include <mm/pmm.h>
 
 /**

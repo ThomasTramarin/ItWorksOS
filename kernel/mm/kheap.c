@@ -4,8 +4,8 @@
 #include <base/stddef.h>
 #include <base/stdint.h>
 #include <kernel/error.h>
-#include <kernel/printk.h>
 #include <klib/list.h>
+#include <log/printk.h>
 #include <mm/layout.h>
 #include <mm/pmm.h>
 

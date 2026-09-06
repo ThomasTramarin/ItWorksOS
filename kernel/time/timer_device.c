@@ -1,5 +1,4 @@
 #include <kernel/error.h>
-#include <kernel/printk.h>
 #include <time/timer_device.h>
 
 /**

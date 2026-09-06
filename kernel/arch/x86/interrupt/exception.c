@@ -1,9 +1,5 @@
 #include <arch/interrupts/exception.h>
 #include <kernel/exception.h>
-#include <kernel/panic.h>
-#include <kernel/printk.h>
-#include <klib/cui.h>
-
 /**
  * @brief Translate from vector interrupt number to portable exception type
  */

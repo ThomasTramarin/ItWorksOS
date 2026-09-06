@@ -1,7 +1,7 @@
 #include <base/sections.h>
-#include <kernel/syslog.h>
 #include <klib/memory.h>
 #include <klib/ringbuf.h>
+#include <log/syslog.h>
 
 // Logs Ring Buffer
 static uint8_t syslog_storage[SYSLOG_BUFFER_SIZE];

@@ -1,8 +1,8 @@
 #include <arch/cpu/cpuid.h>
 #include <arch/cpu/flags.h>
 #include <base/bit.h>
-#include <kernel/printk.h>
 #include <klib/memory.h>
+#include <log/printk.h>
 
 struct x86_cpuid_regs {
   uint32_t eax;

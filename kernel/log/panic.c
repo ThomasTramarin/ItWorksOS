@@ -1,8 +1,8 @@
 #include <base/compiler.h>
 #include <base/stdarg.h>
 #include <base/stdbool.h>
-#include <kernel/panic.h>
-#include <kernel/printk.h>
+#include <log/panic.h>
+#include <log/printk.h>
 
 static bool panicking = false;
 

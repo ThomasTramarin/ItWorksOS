@@ -1,8 +1,8 @@
 #include "klib/cui.h"
-#include <kernel/printk.h>
-#include <kernel/syslog.h>
 #include <klib/printf.h>
 #include <klib/ringbuf.h>
+#include <log/printk.h>
+#include <log/syslog.h>
 
 int printk(const char *fmt, ...) {
   va_list args;

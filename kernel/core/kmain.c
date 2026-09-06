@@ -9,10 +9,10 @@
 #include <kernel/boot.h>
 #include <kernel/initcall.h>
 #include <kernel/kmain.h>
-#include <kernel/panic.h>
-#include <kernel/printk.h>
-#include <kernel/syslog.h>
 #include <klib/cui.h>
+#include <log/panic.h>
+#include <log/printk.h>
+#include <log/syslog.h>
 #include <mm/mm.h>
 
 void __noreturn kmain(uint32_t magic, paddr_t boot_info_phys) {

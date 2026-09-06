@@ -2,8 +2,8 @@
 #include <base/stddef.h>
 #include <kernel/error.h>
 #include <kernel/initcall.h>
-#include <kernel/printk.h>
 #include <klib/string.h>
+#include <log/printk.h>
 
 extern struct initcall __initcall_devdrv_start;
 extern struct initcall __initcall_devdrv_end;

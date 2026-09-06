@@ -1,5 +1,5 @@
-#ifndef KERNEL_SYSLOG_H
-#define KERNEL_SYSLOG_H
+#ifndef LOG_SYSLOG_H
+#define LOG_SYSLOG_H
 
 #include <base/stdbool.h>
 #include <base/stddef.h>

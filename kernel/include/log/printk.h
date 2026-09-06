@@ -1,5 +1,5 @@
-#ifndef KENREL_PRINTK_H
-#define KENREL_PRINTK_H
+#ifndef LOG_PRINTK_H
+#define LOG_PRINTK_H
 #include <base/stdarg.h>
 
 #define PRINTK_FATAL "[FATAL] "

@@ -1,5 +1,5 @@
-#ifndef KENREL_PANIC_H
-#define KENREL_PANIC_H
+#ifndef LOG_PANIC_H
+#define LOG_PANIC_H
 
 #include <base/stdarg.h>
 

@@ -3,7 +3,7 @@
 #include <device/device.h>
 #include <device/driver.h>
 #include <kernel/error.h>
-#include <kernel/printk.h>
+#include <log/printk.h>
 
 /**
  * @brief Global list of registered buses

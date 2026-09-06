@@ -11,6 +11,7 @@ IRQ_DIR 		  := irq
 KLIB_DIR          := klib
 DRIVERS_DIR       := drivers
 DEVICE_DIR        := device
+LOG_DIR			  := log
 TIME_DIR		  := time
 CONSOLE_DIR		  := console
 INCLUDE_DIR       := include
@@ -57,6 +58,7 @@ C_SOURCES := \
 		$(KLIB_DIR) \
 		$(DRIVERS_DIR) \
 		$(DEVICE_DIR) \
+		$(LOG_DIR) \
 		$(TIME_DIR) \
 		$(CONSOLE_DIR) \
 		-name '*.c' \

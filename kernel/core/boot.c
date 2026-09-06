@@ -1,8 +1,8 @@
 #include <base/sections.h>
 #include <boot/boot_info.h>
 #include <kernel/boot.h>
-#include <kernel/printk.h>
 #include <klib/memory.h>
+#include <log/printk.h>
 #include <mm/layout.h>
 
 static struct boot_state kernel_boot_state;
