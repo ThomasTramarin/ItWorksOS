@@ -9,7 +9,6 @@
 #include <kernel/boot.h>
 #include <kernel/initcall.h>
 #include <kernel/kmain.h>
-#include <klib/cui.h>
 #include <log/panic.h>
 #include <log/printk.h>
 #include <log/syslog.h>
@@ -18,7 +17,6 @@
 void __noreturn kmain(uint32_t magic, paddr_t boot_info_phys) {
 
   syslog_init();
-  cui_init(VGA_COLOR_WHITE, VGA_COLOR_BLUE, 0);
 
   struct boot_info *info = (struct boot_info *)PHYS_TO_VIRT(boot_info_phys);
   boot_init(info);

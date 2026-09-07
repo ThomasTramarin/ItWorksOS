@@ -1,8 +1,16 @@
-#include "klib/cui.h"
+#include <console/console.h>
 #include <klib/printf.h>
 #include <klib/ringbuf.h>
 #include <log/printk.h>
 #include <log/syslog.h>
+
+/*
+ * printk writes every message to the system log and prints them to the active
+ * console when one is available.
+ *
+ * Before a console is initialized, messages are still stored in the system log
+ * but are not displayed.
+ */
 
 int printk(const char *fmt, ...) {
   va_list args;
@@ -20,7 +28,7 @@ int vprintk(const char *fmt, va_list args) {
   int total_len = vsnprintf(buffer, sizeof(buffer), fmt, args);
 
   syslog_write(buffer);
-  cui_puts(buffer); // print also to the screen
+  console_write(buffer, total_len);
 
   return total_len;
 }
