@@ -2,6 +2,7 @@
 #define CONSOLE_CONSOLE_H
 
 #include <base/bit.h>
+#include <base/stdbool.h>
 #include <base/stddef.h>
 
 #define CONSOLE_TAB_SIZE 4
@@ -79,12 +80,22 @@ struct console {
    * @param y Target row coordinate [0, height)
    * @return KERR_OK on success, or a negative kernel error code
    */
-  int32_t (*set_cursor)(struct console *con, uint32_t x, uint32_t y);
+  int32_t (*set_cursor_position)(struct console *con, uint32_t x, uint32_t y);
+
+  /**
+   * @brief Enable and disable cursor
+   *
+   * @param con This console instance
+   * @param visible true = visible, false = not visible
+   * @return KERR_OK on success, or a negative kernel error code
+   */
+  int32_t (*set_cursor_visible)(struct console *con, bool visible);
 };
 
 int32_t console_register(struct console *con);
 int32_t console_write(const char *buf, size_t len);
 int32_t console_clear(void);
-int32_t console_set_cursor(uint32_t x, uint32_t y);
+int32_t console_set_cursor_position(uint32_t x, uint32_t y);
+int32_t console_set_cursor_visible(bool visible);
 
 #endif

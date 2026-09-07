@@ -30,8 +30,14 @@ int32_t console_clear(void) {
   return active_con->clear(active_con);
 }
 
-int32_t console_set_cursor(uint32_t x, uint32_t y) {
+int32_t console_set_cursor_position(uint32_t x, uint32_t y) {
   if (!active_con)
     return -KERR_NODEV;
-  return active_con->set_cursor(active_con, x, y);
+  return active_con->set_cursor_position(active_con, x, y);
+}
+
+int32_t console_set_cursor_visible(bool visible) {
+  if (!active_con)
+    return -KERR_NODEV;
+  return active_con->set_cursor_visible(active_con, visible);
 }
