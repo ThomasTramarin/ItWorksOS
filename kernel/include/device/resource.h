@@ -5,7 +5,11 @@
 #include <base/stdint.h>
 #include <irq/irq.h>
 
-enum resource_type { RESOURCE_TYPE_PORT, RESOURCE_TYPE_IRQ };
+enum resource_type {
+  RESOURCE_TYPE_PORT,
+  RESOURCE_TYPE_IRQ,
+  RESOURCE_TYPE_MMIO
+};
 
 /**
  * @brief Device hardware resource
@@ -36,6 +40,16 @@ struct resource {
       struct irq_map *map;
       hwirq_t hwirq;
     } irq;
+
+    /**
+     * @brief Memory-Mapped I/O
+     *
+     * Both start and end are inclusive: [start, end].
+     */
+    struct {
+      paddr_t start;
+      paddr_t end;
+    } mmio;
   };
 };
 
@@ -51,6 +65,22 @@ struct resource {
   {                                                                            \
     .type = RESOURCE_TYPE_IRQ, .irq = {.hwirq = (n), .map = (m) }              \
   }
+
+#define RESOURCE_MMIO(s, e)                                                    \
+  {                                                                            \
+    .type = RESOURCE_TYPE_MMIO, .mmio = {                                      \
+      .start = (s),                                                            \
+      .end = (e),                                                              \
+    }                                                                          \
+  }
+
+#define RESOURCE_RANGE_SIZE(s, e) ((s) <= (e) ? ((e) - (s) + 1) : 0)
+
+#define RESOURCE_PORT_SIZE(r)                                                  \
+  RESOURCE_RANGE_SIZE((r)->port.start, (r)->port.end)
+
+#define RESOURCE_MMIO_SIZE(r)                                                  \
+  RESOURCE_RANGE_SIZE((r)->mmio.start, (r)->mmio.end)
 
 /**
  * @brief Get a resource of a specific type from a resource array
