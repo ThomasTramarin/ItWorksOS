@@ -209,8 +209,24 @@ static inline void list_replace(struct list_node *old_node,
 
 /**
  * @brief Iterate over each node in the list from front to back
+ * @param node Current node
+ * @param list List to iterate
  */
 #define list_for_each(node, list)                                              \
   for ((node) = (list)->head.next; node != &(list)->head; (node) = (node)->next)
+
+/**
+ * @brief Iterate over each node in the list while allowing removal
+ *
+ * Stores the next node before executing the loop body
+ * so that the current node can be removed safely
+ *
+ * @param node Current node
+ * @param next Temporary node used to store the next node
+ * @param list List to iterate
+ */
+#define list_for_each_safe(node, next, list)                                   \
+  for ((node) = (list)->head.next, (next) = (node)->next;                      \
+       (node) != &(list)->head; (node) = (next), (next) = (node)->next)
 
 #endif
