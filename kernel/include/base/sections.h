@@ -27,4 +27,28 @@
  */
 #define __init_data __section(".init.data")
 
+extern char __kernel_start[];
+extern char __kernel_end[];
+
+extern char __init_text_start[];
+extern char __init_text_end[];
+
+extern char __text_start[];
+extern char __text_end[];
+
+extern char __data_start[];
+extern char __data_end[];
+
+extern char __rodata_start[];
+extern char __rodata_end[];
+
+extern char __initcall_devdrv_start[];
+extern char __initcall_devdrv_end[];
+
+extern char __init_bss_start[];
+extern char __init_bss_end[];
+
+extern char __bss_start[];
+extern char __bss_end[];
+
 #endif

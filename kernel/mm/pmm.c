@@ -17,10 +17,6 @@
  * firmware regions, MMIO regions) and allocated frames (memory allocated).
  */
 
-// from the linker
-extern uint8_t __kernel_start[];
-extern uint8_t __kernel_end[];
-
 #define PMM_LOG "PMM: "
 
 #define KERNEL_VIRT_BASE ((vaddr_t)0xC0000000)

@@ -5,9 +5,6 @@
 #include <klib/string.h>
 #include <log/printk.h>
 
-extern struct initcall __initcall_devdrv_start;
-extern struct initcall __initcall_devdrv_end;
-
 static __init int32_t initcalls_invoke_range(struct initcall *start,
                                              struct initcall *end) {
 
@@ -26,6 +23,6 @@ static __init int32_t initcalls_invoke_range(struct initcall *start,
 }
 
 int32_t __init initcalls_invoke_devdrv(void) {
-  return initcalls_invoke_range(&__initcall_devdrv_start,
-                                &__initcall_devdrv_end);
+  return initcalls_invoke_range((struct initcall *)__initcall_devdrv_start,
+                                (struct initcall *)__initcall_devdrv_end);
 }
