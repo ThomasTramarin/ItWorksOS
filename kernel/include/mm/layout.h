@@ -11,6 +11,10 @@
 
 /* Higher Half Kernel offset (3 GiB) */
 #define KERNEL_VIRT_OFFSET 0xC0000000ULL
+#define KERNEL_DIRECT_MAP_SIZE 0x30000000 // 768 MiB
+
+#define USER_START ((vaddr_t)0)
+#define USER_SIZE ((size_t)KERNEL_VIRT_OFFSET)
 
 #define DMA16_LIMIT (16ULL * 1024ULL * 1024ULL)
 
