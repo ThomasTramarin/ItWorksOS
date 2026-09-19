@@ -11,22 +11,36 @@ SECTIONS
         __init_text_start = .;
         KEEP(*kernel.asm.o(.text))
         *(.init.text*)
+
+        . = ALIGN(4096);
         __init_text_end = .;
     }
 
     .text ALIGN(4096) : AT(ADDR(.text) - 0xC0000000)
     {
+        __text_start = .;
         *(.text*)
+
+        . = ALIGN(4096);
+        __text_end = .;
     }
 
     .data ALIGN(4096) : AT(ADDR(.data) - 0xC0000000)
     {
+        __data_start = .;
         *(.data*)
+
+        . = ALIGN(4096);
+        __data_end = .;
     }
 
     .rodata ALIGN(4096) : AT(ADDR(.rodata) - 0xC0000000)
     {
+        __rodata_start = .;
         *(.rodata*)
+
+        . = ALIGN(4096);
+        __rodata_end = .;
     }
 
     .initcalls ALIGN(4096) : AT(ADDR(.initcalls) - 0xC0000000)
@@ -40,6 +54,8 @@ SECTIONS
     {
         __init_bss_start = .;
         *(.init.bss*)
+
+        . = ALIGN(4096);
         __init_bss_end = .;
     }
 
@@ -48,9 +64,10 @@ SECTIONS
         __bss_start = .;
         *(COMMON)
         *(.bss*)
+
+        . = ALIGN(4096);
         __bss_end = .;
     }
 
-    . = ALIGN(4096);
     __kernel_end = .;
 }
