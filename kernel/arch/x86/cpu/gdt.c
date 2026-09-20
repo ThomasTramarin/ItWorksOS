@@ -1,3 +1,4 @@
+#include "arch/cpu/tss.h"
 #include <arch/cpu/gdt.h>
 #include <base/bit.h>
 #include <base/sections.h>
@@ -57,8 +58,6 @@ struct x86_gdt_entry {
  * 1: 64-bit code segment, DB should be clear
  */
 #define X86_GDT_FLAG_L_MASK BIT(1)
-
-#define X86_GDT_FLAG_RESERVED_MASK BIT(0)
 
 /**
  * @brief Present bit
@@ -124,8 +123,7 @@ struct x86_gdt_descriptor {
   uint32_t offset;
 } __attribute__((packed));
 
-/* Null descriptor, Kernel Code and Data*/
-#define X86_GDT_ENTRIES 3
+#define X86_GDT_ENTRIES 6
 
 static struct x86_gdt_raw_entry gdt[X86_GDT_ENTRIES];
 static struct x86_gdt_descriptor gdt_descriptor;
@@ -154,6 +152,9 @@ void __init x86_gdt_init(void) {
   struct x86_gdt_entry null_descr = {0};
   struct x86_gdt_entry kern_code = {0};
   struct x86_gdt_entry kern_data = {0};
+  struct x86_gdt_entry user_code = {0};
+  struct x86_gdt_entry user_data = {0};
+  struct x86_gdt_entry tss_descr = {0};
 
   // Null descriptor
   x86_gdt_set_entry(0, &null_descr);
@@ -174,6 +175,35 @@ void __init x86_gdt_init(void) {
                      X86_GDT_ACCESS_BYTE_RW_MASK | X86_GDT_ACCESS_BYTE_A_MASK;
   kern_data.flags = X86_GDT_FLAG_G_MASK | X86_GDT_FLAG_DB_MASK;
   x86_gdt_set_entry(2, &kern_data);
+
+  // User Code Descriptor (Flat 4GB, Ring 3, Read/Execute)
+  user_code.base = 0;
+  user_code.limit = 0xFFFFF;
+  user_code.access = X86_GDT_ACCESS_BYTE_P_MASK | X86_GDT_ACCESS_BYTE_S_MASK |
+                     X86_GDT_ACCESS_BYTE_E_MASK | X86_GDT_ACCESS_BYTE_RW_MASK |
+                     X86_GDT_ACCESS_BYTE_A_MASK;
+  user_code.access |= 0b01100000; // Ring 3 DPL
+  user_code.flags = X86_GDT_FLAG_G_MASK | X86_GDT_FLAG_DB_MASK;
+  x86_gdt_set_entry(3, &user_code);
+
+  // User Data Descriptor (Flat 4GB, Ring 3, Read/Write)
+  user_data.base = 0;
+  user_data.limit = 0xFFFFF;
+  user_data.access = X86_GDT_ACCESS_BYTE_P_MASK | X86_GDT_ACCESS_BYTE_S_MASK |
+                     X86_GDT_ACCESS_BYTE_RW_MASK | X86_GDT_ACCESS_BYTE_A_MASK;
+  user_data.access |= 0b01100000; // Ring 3 DPL
+  user_data.flags = X86_GDT_FLAG_G_MASK | X86_GDT_FLAG_DB_MASK;
+  x86_gdt_set_entry(4, &user_data);
+
+  // TSS segment
+  struct x86_tss *tss = x86_tss_get();
+
+  tss_descr.base = (uint32_t)tss;
+  tss_descr.limit = sizeof(*tss) - 1;
+  tss_descr.access |= X86_GDT_ACCESS_BYTE_P_MASK;
+  tss_descr.access |= 0x9; // Type: TSS available
+  tss_descr.flags = 0;
+  x86_gdt_set_entry(5, &tss_descr);
 
   x86_gdt_flush(&gdt_descriptor);
 }

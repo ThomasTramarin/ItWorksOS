@@ -27,5 +27,9 @@ x86_gdt_flush:
 
 .flush_cs:
 
+    ; Load TSS
+    mov ax, 0x28   ; GDT[5] = TSS
+    ltr ax
+
     pop ebp
     ret

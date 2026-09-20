@@ -1,6 +1,7 @@
 #include <arch/cpu/cpuid.h>
 #include <arch/cpu/flags.h>
 #include <arch/cpu/gdt.h>
+#include <arch/cpu/tss.h>
 #include <arch/interrupts/idt.h>
 #include <arch/interrupts/isr.h>
 #include <base/sections.h>
@@ -15,6 +16,7 @@ void __init arch_init(void) {
     panic("CPUID is not supported");
   }
 
+  x86_tss_init();
   x86_gdt_init();
   x86_idt_init();
   x86_isr_init();
