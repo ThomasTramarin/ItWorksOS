@@ -18,12 +18,15 @@ void __init boot_init(struct boot_info *info) {
    */
   memcpy(kernel_boot_mmap_entries,
          (struct boot_mem_map_entry *)PHYS_TO_VIRT(info->memory_map_phys),
-         sizeof(struct boot_mem_map_entry) * BOOT_MEMORY_MAP_MAX);
+         sizeof(struct boot_mem_map_entry) * info->memory_map_count);
 
   kernel_boot_state.memory_map = kernel_boot_mmap_entries;
   kernel_boot_state.memory_map_count = info->memory_map_count;
 
   memcpy(&kernel_boot_state.video, &info->video, sizeof(struct boot_video));
+
+  kernel_boot_state.system_image = (void *)PHYS_TO_VIRT(info->system_image);
+  kernel_boot_state.system_image_size = info->system_image_size;
 
   /*
    * Print boot state information
@@ -47,6 +50,9 @@ void __init boot_init(struct boot_info *info) {
         kernel_boot_state.video.text.rows, kernel_boot_state.video.text.cols,
         kernel_boot_state.video.text.page);
   }
+
+  pr_debug("System image: addr=%p size=0x%x\n", kernel_boot_state.system_image,
+           kernel_boot_state.system_image_size);
 }
 
 struct boot_state *boot_get_state(void) { return &kernel_boot_state; }

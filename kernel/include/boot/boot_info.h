@@ -85,6 +85,9 @@ struct boot_info {
                              // stage2 bootloader memory)
 
   struct boot_video video;
+
+  paddr_t system_image;
+  uint32_t system_image_size;
 } __packed;
 
 #endif

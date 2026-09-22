@@ -13,6 +13,9 @@ struct boot_state {
   uint16_t memory_map_count;
   struct boot_mem_map_entry *memory_map;
   struct boot_video video;
+
+  void *system_image;
+  uint32_t system_image_size;
 };
 
 /**

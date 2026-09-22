@@ -45,6 +45,40 @@ stage2_entry:
     call fat32_load_file
     jc .err_disk_read
 
+    ; --- Load system executable ---
+    mov eax, [stage2_context.ebpb + FAT32_EBPB_ROOT_CLUSTER_OFF]
+    mov si, bin_dir
+    call fat32_find_entry
+    jc .err_disk_read
+
+    xor eax, eax
+    mov ax, [buf_dir + bx + FAT32_DIR_CLUSTER_HIGH_OFF]
+    shl eax, 16
+    mov ax, [buf_dir + bx + FAT32_DIR_CLUSTER_LOW_OFF]
+
+    mov si, system_file
+    call fat32_find_entry
+    jc .err_disk_read
+
+    ; save system file size before loading it
+    mov ecx, [buf_dir + bx + FAT32_DIR_FILE_SIZE_OFF]
+
+    xor eax, eax
+    mov ax, [buf_dir + bx + FAT32_DIR_CLUSTER_HIGH_OFF]
+    shl eax, 16
+    mov ax, [buf_dir + bx + FAT32_DIR_CLUSTER_LOW_OFF]
+
+    ; EAX = first system.bin data cluster
+    mov bx, SYSTEM_LOAD_SEG
+    mov es, bx
+    mov si, SYSTEM_LOAD_OFF
+    call fat32_load_file
+    jc .err_disk_read
+
+    mov dword [boot_info.system_image], SYSTEM_LOAD_ADDR
+    mov dword [boot_info.system_image + 4], 0
+    mov [boot_info.system_image_size], ecx
+
     ; save memory map into memory
     xor ax, ax
     mov es, ax
@@ -694,8 +728,10 @@ msg_err_e820:                       db 'ERR_E820_MEMORY_MAP', 0
 msg_err_video_detection:            db 'ERR_VIDEO_MODE_NOT_SUP', 0
 
 ; FAT32 filenames
-boot_dir: db 'BOOT       '
+boot_dir:    db 'BOOT       '
+bin_dir:     db 'BIN        '
 kernel_file: db 'KERNEL  BIN' 
+system_file: db 'SYSTEM  BIN'
 
 ; Buffers
 buf_fat:                            times 512 db 0   ; 1-sector buffer to store a FAT sector 
@@ -740,3 +776,5 @@ boot_info:
     .memory_map_count:  dw 0    ; E820 entries count (2 bytes)
     .memory_map_ptr:    dq 0    ; physical RAM pointer to the first E820 entry (8 bytes)
     .video:             times 2 dq 0    ; struct boot_video (16 bytes)
+    .system_image:      dq 0    ; physical RAM pointer to the system image (8 bytes)
+    .system_image_size  dd 0    ; size, in bytes, of the system image file (4 bytes)
