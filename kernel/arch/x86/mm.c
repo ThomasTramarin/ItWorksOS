@@ -72,14 +72,15 @@ static uint32_t x86_vm_flags_to_pte(uint32_t flags) {
 /**
  * @brief Convert generic VM flags to x86 PDE flags
  *
+ * PDEs are always present and writable
+ * PTEs provide the per page write and user permissions
+ *
  * @param flags Generic virtual memory flags
  * @return Corresponding x86 PDE flags
  */
 static uint32_t x86_vm_flags_to_pde(uint32_t flags) {
-  uint32_t pde_flags = X86_PDE_PRESENT;
 
-  if (flags & VM_WRITE)
-    pde_flags |= X86_PDE_WRITABLE;
+  uint32_t pde_flags = X86_PDE_PRESENT | X86_PDE_WRITABLE;
 
   if (flags & VM_USER)
     pde_flags |= X86_PDE_USER;
@@ -136,12 +137,22 @@ int32_t arch_vm_space_destroy(struct arch_vm_space *vm) {
   return KERR_OK;
 }
 
+/**
+ * Only the kernel PDEs are copied.
+ *
+ * PDEs contain the physical addresses of the page tables, so
+ * every address space references the same kernel page tables.
+ *
+ * All kernel PDEs that are required by processes must already
+ * exist in kernel_vm before this function is called.
+ */
 int32_t arch_vm_space_attach_kernel(struct arch_vm_space *vm,
                                     const struct arch_vm_space *kernel_vm) {
   if (!vm || !kernel_vm)
     return -KERR_INVAL;
 
   uint32_t *pd = (uint32_t *)PHYS_TO_VIRT(vm->pd_phys);
+
   const uint32_t *kernel_pd =
       (const uint32_t *)PHYS_TO_VIRT(kernel_vm->pd_phys);
 
@@ -189,25 +200,10 @@ int32_t arch_vm_map(struct arch_vm_space *vm, vaddr_t virt, paddr_t phys,
       memset(pt, 0, X86_PAGE_SIZE);
 
       pd[pde_index] = pt_phys | x86_vm_flags_to_pde(flags);
+
       pde = pd[pde_index];
     } else if (pde & X86_PDE_PAGE_SIZE) {
       return -KERR_NOSUP;
-    } else {
-      /*
-       * PDE permissions are shared by all PTEs below it.
-       * Promote them when a new mapping requires stronger
-       * permissions.
-       */
-      uint32_t required_flags = 0;
-
-      if (flags & VM_WRITE)
-        required_flags |= X86_PDE_WRITABLE;
-
-      if (flags & VM_USER)
-        required_flags |= X86_PDE_USER;
-
-      pd[pde_index] |= required_flags;
-      pde = pd[pde_index];
     }
 
     uint32_t *pt = (uint32_t *)PHYS_TO_VIRT(pde & X86_PAGE_MASK);
@@ -299,18 +295,6 @@ int32_t arch_vm_protect(struct arch_vm_space *vm, vaddr_t virt, size_t size,
     paddr_t phys = pte & X86_PAGE_MASK;
 
     pt[pte_index] = phys | x86_vm_flags_to_pte(flags);
-
-    /*
-     * A user mapping requires the PDE to remain user-accessible
-     */
-    if (flags & VM_USER)
-      pd[pde_index] |= X86_PDE_USER;
-
-    /**
-     * A writable mapping requires the PDE to remain writable
-     */
-    if (flags & VM_WRITE)
-      pd[pde_index] |= X86_PDE_WRITABLE;
 
     x86_invlpg(va);
   }

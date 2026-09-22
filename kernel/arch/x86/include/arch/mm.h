@@ -37,8 +37,9 @@ int32_t arch_vm_space_destroy(struct arch_vm_space *vm);
 /**
  * @brief Attach shared kernel mappings to a virtual memory space
  *
- * Copies the kernel PDE entries into the virtual memory space
- * so that kernel page tables are shared between address spaces
+ * The virtual memory space will reference the same kernel page tables
+ * as the kernel virtual memory space. User space page tables remain
+ * private to the virtual memory space
  *
  * @param vm Virtual memory space of the process
  * @param kernel_vm Virtual memory space of the kernel
