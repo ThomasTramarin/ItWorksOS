@@ -9,7 +9,7 @@ DISK_IMG := bin/disk.img
 KERNEL_ELF := build/kernel/kernel.elf
 
 # Default target
-.PHONY: all boot kernel tools clean run debug gdb
+.PHONY: all boot kernel tools user clean run debug gdb
 
 all: image
 	@printf "\n--- [IWOS] Build complete ---\n"
@@ -26,7 +26,11 @@ tools:
 	@printf "\n--- [IWOS] Building host tools ---\n"
 	$(MAKE) -C tools/mkimage
 
-image: boot kernel tools
+user:
+	@printf "\n--- [IWOS] Building user executables ---\n"
+	$(MAKE) -C user ARCH=$(ARCH)
+
+image: boot kernel user tools
 	@printf "\n--- [IWOS] Creating disk image ---\n"
 	$(MAKE) -C tools/mkimage image
 
