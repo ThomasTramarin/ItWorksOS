@@ -10,6 +10,7 @@ MM_DIR            := mm
 IRQ_DIR 		  := irq
 KLIB_DIR          := klib
 DRIVERS_DIR       := drivers
+PROCESS_DIR       := process
 DEVICE_DIR        := device
 LOG_DIR			  := log
 TIME_DIR		  := time
@@ -57,6 +58,7 @@ C_SOURCES := \
 		$(IRQ_DIR) \
 		$(KLIB_DIR) \
 		$(DRIVERS_DIR) \
+		$(PROCESS_DIR) \
 		$(DEVICE_DIR) \
 		$(LOG_DIR) \
 		$(TIME_DIR) \
