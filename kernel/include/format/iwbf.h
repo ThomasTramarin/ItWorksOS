@@ -1,5 +1,5 @@
-#ifndef EXEC_IWBF_H
-#define EXEC_IWBF_H
+#ifndef FORMAT_IWBF_H
+#define FORMAT_IWBF_H
 
 /**
  * @brief IWBF (ItWorks Binary Format)
@@ -37,7 +37,7 @@
 #include <base/stdint.h>
 #include <stddef.h>
 
-#define IWBF_HDR_MAGIC "IWBF"
+#define IWBF_HDR_MAGIC 0x46425749u // "IWBF"
 
 /* File Type */
 #define IWBF_HDR_TYPE_EXEC 1 // executable binary
@@ -52,7 +52,7 @@
  * iwbf32_segment descriptors
  */
 struct iwbf32_hdr {
-  char magic[4]; // must be IWBF_HDR_MAGIC
+  uint32_t magic; // must be IWBF_HDR_MAGIC
 
   uint16_t type;
   uint16_t arch;
