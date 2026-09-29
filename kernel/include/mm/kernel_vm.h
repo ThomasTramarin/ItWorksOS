@@ -20,6 +20,14 @@ struct arch_vm_space;
  */
 int32_t vm_kern_attach(struct arch_vm_space *vm);
 
+int32_t vm_kern_map(vaddr_t virt, paddr_t phys, size_t size, uint32_t flags);
+
+int32_t vm_kern_unmap(vaddr_t virt, size_t size);
+
+int32_t vm_kern_protect(vaddr_t virt, size_t size, uint32_t flags);
+
+int32_t vm_kern_translate(vaddr_t virt, paddr_t *phys);
+
 /**
  * @brief Initialize the kernel virtual memory
  *

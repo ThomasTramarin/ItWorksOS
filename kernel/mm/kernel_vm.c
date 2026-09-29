@@ -27,15 +27,21 @@ static bool vm_kern_range_valid(vaddr_t virt, size_t size) {
   return true;
 }
 
-static int32_t vm_kern_map(vaddr_t virt, paddr_t phys, size_t size,
-                           uint32_t flags) {
+int32_t vm_kern_map(vaddr_t virt, paddr_t phys, size_t size, uint32_t flags) {
   if (!vm_kern_range_valid(virt, size))
     return -KERR_INVAL;
 
   return arch_vm_map(&kernel_vm, virt, phys, size, flags);
 }
 
-static int32_t vm_kern_protect(vaddr_t virt, size_t size, uint32_t flags) {
+int32_t vm_kern_unmap(vaddr_t virt, size_t size) {
+  if (!vm_kern_range_valid(virt, size))
+    return -KERR_INVAL;
+
+  return arch_vm_unmap(&kernel_vm, virt, size);
+}
+
+int32_t vm_kern_protect(vaddr_t virt, size_t size, uint32_t flags) {
   if (!vm_kern_range_valid(virt, size))
     return -KERR_INVAL;
 
@@ -47,6 +53,16 @@ int32_t vm_kern_attach(struct arch_vm_space *vm) {
     return -KERR_INVAL;
 
   return arch_vm_space_attach_kernel(vm, &kernel_vm);
+}
+
+int32_t vm_kern_translate(vaddr_t virt, paddr_t *phys) {
+  if (!phys)
+    return -KERR_INVAL;
+
+  if (!vm_kern_range_valid(virt, 1))
+    return -KERR_INVAL;
+
+  return arch_vm_translate(&kernel_vm, virt, phys);
 }
 
 int32_t __init vm_kern_init(void) {
