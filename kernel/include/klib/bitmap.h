@@ -17,6 +17,13 @@ struct bitmap {
 
 #define BITMAP_SIZE(nbits) ((nbits) * sizeof(uint32_t))
 
+#define BITMAP_INIT(buffer, bits)                                              \
+  {                                                                            \
+      .data = (buffer),                                                        \
+      .nbits = (bits),                                                         \
+      .nelems = BITMAP_ELEMS(bits),                                            \
+  }
+
 void bitmap_init(struct bitmap *bm, uint32_t *buffer, size_t nbits);
 void bitmap_set(struct bitmap *bm, size_t bitpos);
 void bitmap_clear(struct bitmap *bm, size_t bitpos);
