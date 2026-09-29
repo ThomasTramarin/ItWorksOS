@@ -1,3 +1,4 @@
+#include "mm/layout.h"
 #include <arch/cpu/control.h>
 #include <arch/mm.h>
 #include <base/align.h>
@@ -306,5 +307,33 @@ int32_t arch_vm_space_load(struct arch_vm_space *vm) {
   if (!vm)
     return -KERR_INVAL;
   x86_cr3_write(vm->pd_phys);
+  return KERR_OK;
+}
+
+int32_t arch_vm_translate(struct arch_vm_space *vm, vaddr_t virt,
+                          paddr_t *phys) {
+  if (!vm || !phys)
+    return -KERR_INVAL;
+
+  size_t pde_index = virt >> 22;
+  size_t pte_index = (virt >> 12) & 0x3FF;
+
+  uint32_t *pd = (uint32_t *)PHYS_TO_VIRT(vm->pd_phys);
+  uint32_t pde = pd[pde_index];
+
+  if (!(pde & X86_PDE_PRESENT))
+    return -KERR_NOENT;
+
+  if (pde & X86_PDE_PAGE_SIZE)
+    return -KERR_NOSUP;
+
+  uint32_t *pt = (uint32_t *)PHYS_TO_VIRT(pde & X86_PAGE_MASK);
+  uint32_t pte = pt[pte_index];
+
+  if (!(pte & X86_PTE_PRESENT))
+    return -KERR_NOENT;
+
+  *phys = (pte & X86_PAGE_MASK) | (virt & (X86_PAGE_SIZE - 1));
+
   return KERR_OK;
 }

@@ -91,4 +91,15 @@ int32_t arch_vm_protect(struct arch_vm_space *vm, vaddr_t virt, size_t size,
  */
 int32_t arch_vm_space_load(struct arch_vm_space *vm);
 
+/**
+ * @brief Translate a virtual address to a physical address
+ *
+ * @param vm Address space containing the mapping
+ * @param virt Virtual address to translate
+ * @param phys Output physical address
+ * @return KERR_OK on success, or a negative kernel error code
+ */
+int32_t arch_vm_translate(struct arch_vm_space *vm, vaddr_t virt,
+                          paddr_t *phys);
+
 #endif
