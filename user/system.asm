@@ -13,14 +13,14 @@ org 0x00400000
 dd 'IWBF'
 dw 1                ; EXEC
 dw 1                ; I386
-dd system_entry       ; entry  
+dd 0x00400000       ; entry  
 dd 1                ; segment_count
 
 ; Segment Table (1 code segment)
 dd 0x00400000           ; vaddr
 dd segment_data - $$    ; file_off
 dd segment_data_end - segment_data ; file_size
-dd segment_data_end - segment_data ; mem_size
+dd 4096 ; mem_size
 dd 0x5                  ; READ | EXEC
 
 
