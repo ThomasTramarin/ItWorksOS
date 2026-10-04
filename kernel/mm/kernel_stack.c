@@ -72,6 +72,7 @@ int32_t kstack_free(struct kernel_stack *stack) {
 
   stack->base = 0;
   stack->size = 0;
+  stack->stack_pointer = 0;
 
   return KERR_OK;
 }

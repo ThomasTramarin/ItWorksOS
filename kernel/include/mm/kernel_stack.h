@@ -22,6 +22,7 @@
  */
 struct kernel_stack {
   vaddr_t base;
+  vaddr_t stack_pointer; // current ESP
   vaddr_t size;
 };
 
