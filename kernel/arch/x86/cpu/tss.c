@@ -16,3 +16,5 @@ void __init x86_tss_init(void) {
 }
 
 struct x86_tss *x86_tss_get(void) { return &tss; }
+
+void x86_tss_set_kernel_stack(uint32_t esp0) { tss.esp0 = esp0; }
