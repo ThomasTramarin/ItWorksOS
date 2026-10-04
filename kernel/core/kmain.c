@@ -7,12 +7,15 @@
 #include <irq/irq.h>
 #include <kernel/arch.h>
 #include <kernel/boot.h>
+#include <kernel/error.h>
 #include <kernel/initcall.h>
 #include <kernel/kmain.h>
 #include <log/panic.h>
 #include <log/printk.h>
 #include <log/syslog.h>
 #include <mm/mm.h>
+#include <process/pid.h>
+#include <process/process.h>
 
 void __noreturn kmain(uint32_t magic, paddr_t boot_info_phys) {
 
@@ -45,14 +48,40 @@ void __noreturn kmain(uint32_t magic, paddr_t boot_info_phys) {
 
   initcalls_invoke_devdrv();
 
-  kheap_dump();
+  pid_init();
 
   printk("Welcome to ItWorksOS\n");
 
-  hal_interrupt_enable();
+  struct process *system_proc = process_create("system");
+  if (KERR_PTR_IS_ERR(system_proc)) {
+    panic("Failed to create system process: %d", KERR_PTR_ERR(system_proc));
+  }
 
-  // CPU halt
-  while (1) {
+  struct boot_state *boot = boot_get_state();
+
+  if (KERR_IS_ERR(process_load(system_proc, boot->system_image,
+                               (size_t)boot->system_image_size))) {
+    panic("Failed to load system process");
+  }
+
+  if (KERR_IS_ERR(process_prepare(system_proc))) {
+    panic("Failed to prepare system process");
+  }
+
+  kheap_dump();
+
+  // RUN SYSTEM PROCESS
+  if (KERR_IS_ERR(vm_space_load(&system_proc->vm))) {
+    panic("system: vm_space_load");
+  }
+
+  system_proc->state = PROCESS_RUNNING;
+
+  if (KERR_IS_ERR(process_start(system_proc))) {
+    panic("system: process_start");
+  }
+
+  while (true) {
     hal_cpu_halt();
   }
 }
