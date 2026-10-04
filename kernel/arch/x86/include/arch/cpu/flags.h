@@ -14,15 +14,16 @@
 /*
  * EFLAGS bit masks
  */
-#define X86_FLAGS_CF_MASK BIT(0)  // Carry Flag
-#define X86_FLAGS_PF_MASK BIT(2)  // Parity Flag
-#define X86_FLAGS_AF_MASK BIT(4)  // Auxiliary Carry Flag
-#define X86_FLAGS_ZF_MASK BIT(6)  // Zero Flag
-#define X86_FLAGS_SF_MASK BIT(7)  // Sign Flag
-#define X86_FLAGS_TF_MASK BIT(8)  // Trap Flag
-#define X86_FLAGS_IF_MASK BIT(9)  // Interrupt Enable Flag
-#define X86_FLAGS_DF_MASK BIT(10) // Direction Flag
-#define X86_FLAGS_OF_MASK BIT(11) // Overflow Flag
+#define X86_FLAGS_CF_MASK BIT(0)       // Carry Flag
+#define X86_FLAGS_RESERVED_MASK BIT(1) // Carry Flag
+#define X86_FLAGS_PF_MASK BIT(2)       // Parity Flag
+#define X86_FLAGS_AF_MASK BIT(4)       // Auxiliary Carry Flag
+#define X86_FLAGS_ZF_MASK BIT(6)       // Zero Flag
+#define X86_FLAGS_SF_MASK BIT(7)       // Sign Flag
+#define X86_FLAGS_TF_MASK BIT(8)       // Trap Flag
+#define X86_FLAGS_IF_MASK BIT(9)       // Interrupt Enable Flag
+#define X86_FLAGS_DF_MASK BIT(10)      // Direction Flag
+#define X86_FLAGS_OF_MASK BIT(11)      // Overflow Flag
 
 #define X86_FLAGS_IOPL_MASK (BIT(12) | BIT(13)) // I/O Privilege Level
 #define X86_FLAGS_IOPL_SHIFT 12
