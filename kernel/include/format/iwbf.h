@@ -34,8 +34,7 @@
  * segment descriptor.
  */
 
-#include <base/stdint.h>
-#include <stddef.h>
+#include <base/stddef.h>
 
 #define IWBF_HDR_MAGIC 0x46425749u // "IWBF"
 
@@ -82,7 +81,7 @@ struct iwbf32_hdr {
 /*
  * Describes one loadable memory region of the executable
  */
-struct iwbf32_segment {
+struct iwbf32_segment_hdr {
   /* Starting virtual address of the segment in the process address space */
   uint32_t vaddr;
 
@@ -114,5 +113,29 @@ struct iwbf32_segment {
   /* Memory permissions of the segment */
   uint32_t flags;
 };
+
+#define IWBF32_HDR_SIZE 16
+#define IWBF32_SEGMENT_HDR_SIZE 20
+
+/**
+ * @brief Parse and validate an IWBF header
+ *
+ * @param buf Input buffer containing the header
+ * @param size Size of the input buffer
+ * @param out Parsed header
+ * @return KERR_OK on success or a negative kernel error code
+ */
+int32_t iwbf_parse_hdr(const void *buf, size_t size, struct iwbf32_hdr *out);
+
+/**
+ * @brief Parse and validate an IWBF segment header
+ *
+ * @param buf Input buffer containing the segment header
+ * @param size Size of the input buffer
+ * @param out Parsed segment header
+ * @return KERR_OK on success or a negative kernel error code
+ */
+int32_t iwbf_parse_segment_hdr(const void *buf, size_t size,
+                               struct iwbf32_segment_hdr *out);
 
 #endif
