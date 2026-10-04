@@ -8,6 +8,9 @@
 
 #define PROCESS_MAX PID_MAX
 
+#define USER_STACK_TOP 0xBFFFE000
+#define USER_STACK_SIZE (4 * 4096)
+
 enum process_state {
   PROCESS_CREATED,
   PROCESS_READY,
@@ -25,6 +28,8 @@ struct process {
 
   struct kernel_stack kstack;
 
+  vaddr_t entry;
+
   struct list_node sched_node;
 };
 
@@ -40,6 +45,46 @@ struct process {
  * kernel error code on failure
  */
 struct process *process_create(const char *name);
+
+/**
+ * @brief Prepare a created process for execution
+ *
+ * Allocates the user stack and prepares the initial user mode
+ * execution stack frame.
+ *
+ * @param proc Process to prepare
+ * @return KERR_OK on success or a negative kernel error code
+ */
+int32_t process_prepare(struct process *proc);
+
+/**
+ * @brief Get a process by its process PID
+ *
+ * @param pid Process ID
+ * @return Pointer to the process, or NULL if not found
+ */
 struct process *process_get(pid_t pid);
+
+/**
+ * @brief Load an executable image into a process
+ *
+ * Loads the executable segments into the process address space
+ * and sets the process entry point.
+ *
+ * @param proc Process to load the executable into
+ * @param image Executable image previously loaded into RAM
+ * @param size Size of the executable image in bytes
+ * @return KERR_OK on success or a negative kernel error code
+ */
+int32_t process_load(struct process *proc, const void *image, size_t size);
+
+/**
+ * @brief Start a prepared process
+ *
+ * Switches execution to the process in user mode.
+ *
+ * @param proc Process to start
+ */
+int32_t process_start(struct process *proc);
 
 #endif
