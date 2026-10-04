@@ -15,6 +15,7 @@ DEVICE_DIR        := device
 LOG_DIR			  := log
 TIME_DIR		  := time
 CONSOLE_DIR		  := console
+FORMAT_DIR		  := format
 INCLUDE_DIR       := include
 ARCH_DIR          := arch/$(ARCH)
 ARCH_INCLUDE_DIR  := $(ARCH_DIR)/include
@@ -61,6 +62,7 @@ C_SOURCES := \
 		$(PROCESS_DIR) \
 		$(DEVICE_DIR) \
 		$(LOG_DIR) \
+		$(FORMAT_DIR) \
 		$(TIME_DIR) \
 		$(CONSOLE_DIR) \
 		-name '*.c' \
