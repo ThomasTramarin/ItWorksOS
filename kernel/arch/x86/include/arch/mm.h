@@ -26,6 +26,8 @@ size_t arch_vm_page_size(void);
  */
 int32_t arch_vm_space_init(struct arch_vm_space *vm);
 
+int32_t arch_vm_kernel_prepare(struct arch_vm_space *vm);
+
 /**
  * @brief Destroy an architecture-specific virtual memory space
  *

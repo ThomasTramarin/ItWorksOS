@@ -106,6 +106,28 @@ int32_t arch_vm_space_init(struct arch_vm_space *vm) {
   return KERR_OK;
 }
 
+int32_t arch_vm_kernel_prepare(struct arch_vm_space *vm) {
+  if (!vm)
+    return -KERR_INVAL;
+
+  uint32_t *pd = (uint32_t *)PHYS_TO_VIRT(vm->pd_phys);
+
+  for (size_t i = X86_KERNEL_PDE_BASE; i < X86_PDE_COUNT; i++) {
+
+    paddr_t pt_phys;
+
+    KERR_TRY(PMM_ALLOC_LOWMEM(1, &pt_phys));
+
+    uint32_t *pt = (uint32_t *)PHYS_TO_VIRT(pt_phys);
+
+    memset(pt, 0, X86_PAGE_SIZE);
+
+    pd[i] = pt_phys | X86_PDE_PRESENT | X86_PDE_WRITABLE;
+  }
+
+  return KERR_OK;
+}
+
 int32_t arch_vm_space_destroy(struct arch_vm_space *vm) {
   if (!vm)
     return -KERR_INVAL;

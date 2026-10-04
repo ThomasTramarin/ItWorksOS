@@ -78,6 +78,8 @@ int32_t __init vm_kern_init(void) {
    */
   KERR_TRY(arch_vm_space_init(&kernel_vm));
 
+  KERR_TRY(arch_vm_kernel_prepare(&kernel_vm));
+
   /**
    * Create the permanent direct map
    */
