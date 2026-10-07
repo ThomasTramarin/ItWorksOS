@@ -1,5 +1,6 @@
 #include <arch/interrupts/exception.h>
 #include <kernel/exception.h>
+#include <log/printk.h>
 /**
  * @brief Translate from vector interrupt number to portable exception type
  */
@@ -13,6 +14,9 @@ static enum exception_type x86_exception_translate(uint32_t vector) {
 }
 
 void x86_exception_handler(struct x86_interrupt_frame *frame) {
+
+  pr_err("Exception (x86): num: %d, err_code: %d", frame->int_no,
+         frame->err_code);
 
   // build portable exception_info
   struct exception_info info = {

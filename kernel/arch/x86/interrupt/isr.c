@@ -5,6 +5,7 @@
 #include <arch/interrupts/isr.h>
 #include <arch/interrupts/nmi.h>
 #include <arch/interrupts/pic.h>
+#include <arch/interrupts/syscall.h>
 #include <base/sections.h>
 
 extern void *x86_isr_stub_table[X86_IDT_ENTRIES];
@@ -60,6 +61,11 @@ void __attribute__((cdecl)) x86_isr_handler(struct x86_interrupt_frame *frame) {
   // Non-Maskable Interrupt
   if (vector == 2) {
     x86_nmi_handler(frame);
+    return;
+  }
+
+  if (vector == 0x80) {
+    x86_syscall_handler(frame);
     return;
   }
 
