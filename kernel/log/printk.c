@@ -1,4 +1,5 @@
 #include <console/console.h>
+#include <hal/port.h>
 #include <klib/printf.h>
 #include <klib/ringbuf.h>
 #include <log/printk.h>
@@ -29,6 +30,15 @@ int vprintk(const char *fmt, va_list args) {
 
   syslog_write(buffer);
   console_write(buffer, total_len);
+
+  /*
+   * Output the string through QEMU's debugcon device.
+   *
+   * TODO: Make debugcon output optional through kernel configuration.
+   */
+  for (int i = 0; i < total_len; i++) {
+    hal_port_write8(0xE9, buffer[i]);
+  }
 
   return total_len;
 }

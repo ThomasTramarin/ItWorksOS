@@ -46,10 +46,10 @@ clean:
 	@echo "\n--- [IWOS] Clean complete ---\n"
 
 run: image
-	qemu-system-i386 -drive file=$(DISK_IMG),format=raw
+	qemu-system-i386 -drive file=$(DISK_IMG),format=raw -debugcon stdio
 
 debug: image	
-	qemu-system-i386 -drive file=$(DISK_IMG),format=raw -s -S
+	qemu-system-i386 -drive file=$(DISK_IMG),format=raw -s -S -debugcon stdio
 
 gdb: kernel
 	$(GDB) $(KERNEL_ELF) -x scripts/kernel.gdb
