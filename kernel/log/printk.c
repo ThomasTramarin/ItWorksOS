@@ -5,40 +5,26 @@
 #include <log/printk.h>
 #include <log/syslog.h>
 
-/*
- * printk writes every message to the system log and prints them to the active
- * console when one is available.
- *
- * Before a console is initialized, messages are still stored in the system log
- * but are not displayed.
- */
-
-int printk(const char *fmt, ...) {
+int printk(enum log_level level, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
 
-  int ret = vprintk(fmt, args);
+  int ret = vprintk(level, fmt, args);
 
   va_end(args);
   return ret;
 }
 
-int vprintk(const char *fmt, va_list args) {
+int vprintk(enum log_level level, const char *fmt, va_list args) {
+  // TODO: use a larger buffer
+
   char buffer[1024];
 
   int total_len = vsnprintf(buffer, sizeof(buffer), fmt, args);
+  if (total_len < 0)
+    return total_len;
 
-  syslog_write(buffer);
-  console_write(buffer, total_len);
-
-  /*
-   * Output the string through QEMU's debugcon device.
-   *
-   * TODO: Make debugcon output optional through kernel configuration.
-   */
-  for (int i = 0; i < total_len; i++) {
-    hal_port_write8(0xE9, buffer[i]);
-  }
+  (void)syslog_write(level, buffer);
 
   return total_len;
 }

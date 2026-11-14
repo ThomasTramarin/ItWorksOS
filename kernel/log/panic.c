@@ -1,3 +1,5 @@
+#include "hal/cpu.h"
+#include "hal/interrupt.h"
 #include <base/compiler.h>
 #include <base/stdarg.h>
 #include <base/stdbool.h>
@@ -9,15 +11,11 @@ static bool panicking = false;
 void __noreturn panic(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
-
   vpanic(fmt, args);
 }
 
 void __noreturn vpanic(const char *fmt, va_list args) {
-  // TODO: call HAL functions
-
-  // disable interrupts
-  asm volatile("cli");
+  hal_interrupt_disable();
 
   if (panicking) {
     goto halt;
@@ -26,14 +24,14 @@ void __noreturn vpanic(const char *fmt, va_list args) {
 
   pr_fatal("\n\n--- KERNEL PANIC ---\n");
 
-  vprintk(fmt, args);
-  printk("\n");
+  vprintk(LOG_FATAL, fmt, args);
+  pr_fatal("\n");
 
   // TODO: HAL dump registers
 
 halt:
   pr_fatal("\n--- System Halted ---\n");
   while (1) {
-    asm volatile("hlt");
+    hal_cpu_halt();
   }
 }
