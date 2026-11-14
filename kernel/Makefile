@@ -48,6 +48,10 @@ else ifeq ($(BUILD),release)
 	CFLAGS += -O2
 endif
 
+ifeq ($(CONFIG_QEMU_DEBUGCON),1)
+    CFLAGS += -DCONFIG_QEMU_DEBUGCON
+endif
+
 # Kernel Entry
 KERNEL_ENTRY_SRC := $(ARCH_DIR)/kernel.asm
 KERNEL_ENTRY_OBJ := $(BUILD_DIR)/arch/$(ARCH)/kernel.asm.o
