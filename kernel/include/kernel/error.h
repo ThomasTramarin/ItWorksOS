@@ -22,15 +22,17 @@
 enum kerror {
   KERR_OK = 0,
 
-  KERR_INVAL,  /* argument(s) not valid */
-  KERR_RANGE,  /* argument(s) out of range */
-  KERR_NOMEM,  /* insufficient memory */
-  KERR_NOENT,  /* resource does not exist */
-  KERR_EXISTS, /* the resource already exists */
-  KERR_BUSY,   /* the resource is busy */
-  KERR_NOSPC,  /* insufficient resource space */
-  KERR_NOSUP,  /* operation or configuration not supported */
-  KERR_NODEV,  /* no device*/
+  KERR_INVAL,   /* argument(s) not valid */
+  KERR_RANGE,   /* argument(s) out of range */
+  KERR_NOMEM,   /* insufficient memory */
+  KERR_NOENT,   /* resource does not exist */
+  KERR_EXISTS,  /* the resource already exists */
+  KERR_BUSY,    /* the resource is busy */
+  KERR_NOSPC,   /* insufficient resource space */
+  KERR_NOSUP,   /* operation or configuration not supported */
+  KERR_NODEV,   /* no device*/
+  KERR_IO,      /* I/O error */
+  KERR_TIMEOUT, /* operation timed out */
 };
 
 typedef enum kerror kerror_t;
