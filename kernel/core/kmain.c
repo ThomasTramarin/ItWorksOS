@@ -10,7 +10,7 @@
 #include <kernel/error.h>
 #include <kernel/initcall.h>
 #include <kernel/kmain.h>
-#include <log/panic.h>
+#include <kernel/panic.h>
 #include <log/printk.h>
 #include <log/syslog.h>
 #include <mm/mm.h>
@@ -49,8 +49,6 @@ void __noreturn kmain(uint32_t magic, paddr_t boot_info_phys) {
   initcalls_invoke_devdrv();
 
   pid_init();
-
-  printk("Welcome to ItWorksOS\n");
 
   struct process *system_proc = process_create("system");
   if (KERR_PTR_IS_ERR(system_proc)) {

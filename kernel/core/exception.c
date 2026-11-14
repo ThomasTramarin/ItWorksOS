@@ -1,5 +1,5 @@
 #include <kernel/exception.h>
-#include <log/panic.h>
+#include <kernel/panic.h>
 #include <log/printk.h>
 
 void exception_dispatch(struct exception_info *info) {

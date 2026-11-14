@@ -6,7 +6,7 @@
 #include <arch/interrupts/isr.h>
 #include <base/sections.h>
 #include <kernel/arch.h>
-#include <log/panic.h>
+#include <kernel/panic.h>
 
 void __init arch_init(void) {
   x86_cli(); // disable interrupts

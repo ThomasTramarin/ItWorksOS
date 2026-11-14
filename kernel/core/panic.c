@@ -1,9 +1,9 @@
-#include "hal/cpu.h"
-#include "hal/interrupt.h"
 #include <base/compiler.h>
 #include <base/stdarg.h>
 #include <base/stdbool.h>
-#include <log/panic.h>
+#include <hal/cpu.h>
+#include <hal/interrupt.h>
+#include <kernel/panic.h>
 #include <log/printk.h>
 
 static bool panicking = false;
