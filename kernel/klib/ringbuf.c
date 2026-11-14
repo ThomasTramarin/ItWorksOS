@@ -25,7 +25,7 @@ size_t ringbuf_available(const ringbuf_t *rb) {
 }
 
 void ringbuf_overwrite(ringbuf_t *rb, uint8_t data) {
-  if (!rb || !rb->buf || rb->cap)
+  if (!rb || !rb->buf || !rb->cap)
     return;
 
   if (ringbuf_is_full(rb))
@@ -82,8 +82,7 @@ size_t ringbuf_read(ringbuf_t *rb, uint8_t *dst, size_t len) {
     len = available;
 
   for (size_t i = 0; i < len; i++) {
-    if (dst)
-      dst[i] = rb->buf[rb->tail & (rb->cap - 1)];
+    dst[i] = rb->buf[rb->tail & (rb->cap - 1)];
     rb->tail++;
   }
 
